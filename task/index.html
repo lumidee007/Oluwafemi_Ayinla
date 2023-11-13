@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>API FETCH</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="API FETCH" />
+    <meta name="author" content="Oluwafemi Ayinla" />
+     <link rel="stylesheet" href="libs/css/styles.css" />
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <th>API name</th>
+        <th>API description</th>
+        <th></th>
+      </tr>
+        <tr>
+        <td>WikipediaSearch</td>
+        <td><label for="selwikiCountry">Select a Country:</label>
+            <select name="wikisearch" id="selwikiCountry">
+              <option value="spain" selected>Spain</option>
+              <option value="dubai">Dubai</option>
+              <option value="germany">Germany</option>
+              <option value="scotland">Scotland</option>
+              <option value="italy">Italy</option>
+              <option value="china">China</option>
+              <option value="">United kingdom</option>
+              <option value="australia">Australia</option>
+              <option value="nigeria">Nigeria</option>
+            </select>
+        </td>
+        <td class="btn"><button id="wikiRun" type="submit">Submit</button></td>
+      </tr>
+      <tr>
+        <td>Neighbours</td>
+        <td><label for="selNeighbour">Select a Country:</label>
+            <select name="neighbourId" id="selNeighbour">
+              <option value="2782113" selected>Austria</option>
+              <option value="3017382">France</option>
+              <option value="2921044">Germany</option>
+              <option value="3175395">Italy</option>
+              <option value="3042058">Liechtenstein</option>
+            </select>
+        </td>
+        <td class="btn"><button id="neighbourRun" type="submit">Submit</button></td>
+      </tr>
+        <tr>
+        <td>Search</td>
+        <td><label for="selSearch">Select a Country:</label>
+            <select name="search" id="selSearch">
+              <option value="Argentina" selected>Argentina</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Sweden">Sweden</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Mexico">Mexico</option>
+              <option value="Brazil">Brazil</option>
+              <option value="Canada">Canada</option>
+              <option value="Norway">Norway</option>
+            </select>
+        </td>
+        <td class="btn"><button id="searchSubmit" type="submit">Submit</button></td>
+      </tr>
+      <tr>
+          <td colspan="3" id="results">
+
+          </td>
+        </tr>
+      </tr>
+    </table>
+    <div id="preloader"></div>
+    <script
+      type="application/javascript"
+      src="libs/js/jquery-2.2.3.min.js"
+    ></script>
+    <script type="application/javascript" src="libs/js/script.js"></script>
+  </body>
+</html>
