@@ -3,6 +3,7 @@ let marker;
 let countryName;
 let countryCode;
 let currency_Code;
+let TerritoryGeo;
 let BoundaryStyling = {
   color: "blue",
   weight: 2.9,
@@ -17,27 +18,30 @@ $(document).ready(function () {
         $(this).remove();
       });
 
-    updateCurrentLocation();
     mapConfig();
     getCountryList();
-
+    updateCurrentLocation();
     $("#countrySelect").change(handleCountryChange);
   }
 });
 
 function handleCountryChange() {
-  let TerritoryGeo = L.geoJson();
   countryName = $("#countrySelect option:selected").text();
+  let country = countryName;
 
   $.ajax({
     url: "libs/php/getCountryBorder.php",
     type: "POST",
     dataType: "json",
     data: {
-      country: countryName,
+      country: country,
     },
     success: function (result) {
-      TerritoryGeo.clearLayers();
+      if (TerritoryGeo) {
+        TerritoryGeo.clearLayers();
+      } else {
+        TerritoryGeo = L.geoJson();
+      }
       TerritoryGeo.addData(result);
       TerritoryGeo.setStyle(BoundaryStyling);
       TerritoryGeo.addTo(map); //
@@ -82,18 +86,20 @@ function getCountryList() {
 //GetLocation
 function updateCurrentLocation() {
   if (navigator.geolocation) {
-    let options = { timeout: 55000 };
+    let options = { timeout: 65000 };
     navigator.geolocation.getCurrentPosition(
       setNewPosition,
       initializeDefaultCountry,
       options
     );
+  } else {
+    initializeDefaultCountry();
   }
 }
 
 //Default location
 function initializeDefaultCountry() {
-  let defaultCountryCode = "FR";
+  let defaultCountryCode = "AU";
   countryCode = defaultCountryCode;
   $("#countrySelect").val(countryCode).change();
 }
@@ -105,7 +111,7 @@ function setNewPosition(position) {
 
   $.ajax({
     url: "libs/php/getLatLong.php",
-    type: "POST",
+    type: "GET",
     dataType: "json",
     data: {
       lat: latitude,
@@ -114,11 +120,11 @@ function setNewPosition(position) {
     success: function (result) {
       countryCode =
         result["data"]["results"][0]["components"]["ISO_3166-1_alpha-2"];
-      $("#countrySelect").val(countryCode).change(handleCountryChange);
+      $("#countrySelect").val(countryCode).change();
     },
     error: function (jqXHR, textStatus, errorThrown) {
+      initializeDefaultCountry();
       console.log("error", errorThrown);
-      alert("Error getting your current location");
     },
   });
 }
@@ -240,7 +246,7 @@ function fetchCountryInfo() {
         $("#infoContainer").empty();
 
         currency_Code = result["data"][0]["currencyCode"];
-        $("#country-name").html(countryName);
+        $("#country-name").html($("#countrySelect option:selected").text());
         $("#country-capital").html(result["data"][0]["capital"]);
         $("#country-continent").html(result["data"][0]["continentName"]);
         $("#country-population").html(
