@@ -1,11 +1,14 @@
 let map;
-let marker;
+// let marker;
 let countryName;
 let countryCode;
 let currency_Code;
 let TerritoryGeo;
+let cityLayer;
+let quakeLayer;
+let layerControl;
 let BoundaryStyling = {
-  color: "blue",
+  color: "green",
   weight: 2.9,
   opacity: 0.55,
 };
@@ -46,12 +49,16 @@ function handleCountryChange() {
       TerritoryGeo.setStyle(BoundaryStyling);
       TerritoryGeo.addTo(map); //
       map.fitBounds(TerritoryGeo.getBounds());
+
       fetchCountryWeather();
       fetchCountryInfo();
       fetchCountryHolidays();
       fetchCountryNews();
       fetchCountryCities();
       currencyConversion();
+      getCities();
+      getEarthQuake();
+      getGeographicPoint();
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log(jqXHR);
@@ -163,19 +170,66 @@ function mapConfig() {
     }
   );
 
-  let basemaps = {
+  cityLayer = L.markerClusterGroup({
+    iconCreateFunction: function (e) {
+      return (
+        (icon = '<span class="fas fa-city"></span>'),
+        new L.DivIcon({
+          html:
+            "<div><span>" + icon + "<br>" + e.getChildCount() + "</span></div>",
+          className: "marker-cluster marker-cluster-small marker-cluster-city",
+          iconSize: new L.Point(40, 40),
+        })
+      );
+    },
+  });
+
+  quakeLayer = L.markerClusterGroup({
+    iconCreateFunction: function (e) {
+      return (
+        (icon = '<span class="fas fa-bolt"></span>'),
+        new L.DivIcon({
+          html:
+            "<div><span>" + icon + "<br>" + e.getChildCount() + "</span></div>",
+          className: "marker-cluster marker-cluster-small marker-cluster-quake",
+          iconSize: new L.Point(40, 40),
+        })
+      );
+    },
+  });
+
+  landmarkLayer = L.markerClusterGroup({
+    iconCreateFunction: function (e) {
+      return (
+        (icon = '<span class="fa-solid fas fa-tree"></span>'),
+        new L.DivIcon({
+          html:
+            "<div><span>" + icon + "<br>" + e.getChildCount() + "</span></div>",
+          className: "marker-cluster marker-cluster-small marker-cluster-quake",
+          iconSize: new L.Point(40, 40),
+        })
+      );
+    },
+  });
+
+  map = L.map("map", {
+    layers: [streets, satellite, EarthAtNight],
+  }).setView([54.5, -4], 6);
+
+  let baseMaps = {
     Streets: streets,
     Satellite: satellite,
     EarthAtNight: EarthAtNight,
   };
 
-  map = L.map("map", {
-    layers: [streets],
-  }).setView([51.51, -0.09], 6);
+  let overlayMaps = {
+    Cities: cityLayer,
+    Earthquakes: quakeLayer,
+    Landmark: landmarkLayer,
+  };
 
-  L.control.layers(basemaps).addTo(map);
-
-  marker = L.marker([51.5, -0.08]).addTo(map);
+  L.control.layers(baseMaps, overlayMaps).addTo(map),
+    L.control.scale().addTo(map);
 
   //DEFINE ALL MODALS
 
@@ -244,7 +298,6 @@ function fetchCountryInfo() {
     success: (result) => {
       if (result.status.name == "ok") {
         $("#infoContainer").empty();
-
         currency_Code = result["data"][0]["currencyCode"];
         $("#country-name").html($("#countrySelect option:selected").text());
         $("#country-capital").html(result["data"][0]["capital"]);
@@ -268,35 +321,153 @@ function fetchCountryInfo() {
 
 function fetchCountryWeather() {
   $("#country-weather-info").html(
-    $("#countrySelect option:selected").text() + " Weather Information"
+    $("#countrySelect option:selected").text() + " Weather Information today"
   );
   $.ajax({
     url: "libs/php/getWeatherInfo.php",
-    type: "POST",
+    type: "GET",
     dataType: "json",
     data: {
       country: $("#countrySelect option:selected").text(),
     },
     success: function (result) {
+      let weatherIcon;
+      let icon;
+      let weatherSubset;
       if (result.status.name == "ok") {
-        $("#country-temp").html(result["data"]["main"]["temp"] + "°C");
-        $("#country-pressure").html(
-          result["data"]["main"]["pressure"] + " bar"
+        weatherSubset = result.data.days.slice(1, 6);
+        weatherIcon = result.data.days[0]["icon"];
+        icon = getIcon(weatherIcon);
+        $("#country-temp").html(result.data.days[0]["temp"] + "°C");
+        $("#country-low-temp").html(result.data.days[0]["feelslikemin"] + "°C");
+        $("#country-pressure").html(result.data.days[0]["pressure"] + "°C");
+        $("#country-wind-speed").html(
+          result.data.days[0]["windspeed"] + " m/s"
         );
-        $("#country-humidity").html(result["data"]["main"]["humidity"] + " %");
-        $("#country-low-temp").html(
-          result["data"]["main"]["feels_like"] + " °C"
-        );
-        $("#country-wind-speed").html(result["data"]["wind"]["speed"] + " m/s");
         $("#country-weather-direction").html(
-          result["data"]["weather"][0]["description"]
+          result.data.days[0]["description"]
         );
+        $("#weather-icon-today").html(icon);
       }
+      renderForecastTable(weatherSubset);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error getting the get country weather");
     },
   });
+}
+
+function renderForecastTable(subset) {
+  const tableContainer = document.getElementById("table-container");
+  const existingTbody = tableContainer.querySelector("tbody");
+  if (existingTbody) {
+    existingTbody.innerHTML = "";
+  }
+  const table = document.createElement("table");
+  table.classList.add("table");
+
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+
+  // Create table header
+  const headerRow = document.createElement("tr");
+  const headerCell = document.createElement("th");
+  headerCell.setAttribute("colspan", "5");
+  headerCell.classList.add("fw-bold", "fs-4", "text-center");
+  headerCell.textContent = "Five-day weather forecast";
+  headerRow.appendChild(headerCell);
+  thead.appendChild(headerRow);
+
+  // Create date header row
+  const dateRow = document.createElement("tr");
+  for (let i = 0; i < 5; i++) {
+    const dateCell = document.createElement("td");
+    dateCell.setAttribute("id", `date${i + 1}`);
+    dateCell.textContent = new Date(subset[i].datetime).toLocaleDateString(
+      "en-US",
+      { weekday: "short", month: "short", day: "numeric" }
+    );
+    dateRow.appendChild(dateCell);
+  }
+  tbody.appendChild(dateRow);
+
+  // Create icon row
+  const iconRow = document.createElement("tr");
+  for (let i = 0; i < 5; i++) {
+    const iconCell = document.createElement("td");
+    const icon = document.createElement("span");
+    icon.classList.add("fa-solid", "fa-circle-info", "fa-xl", "text-success");
+    icon.classList.add(getIconClass(subset[i].icon));
+    iconCell.appendChild(icon);
+    iconRow.appendChild(iconCell);
+  }
+  tbody.appendChild(iconRow);
+
+  // Create temperature row
+  const tempMinRow = document.createElement("tr");
+  for (let i = 0; i < 5; i++) {
+    const tempMinCell = document.createElement("td");
+    tempMinCell.setAttribute("id", `daily${i + 1}`);
+    tempMinCell.innerHTML = `${subset[i].temp}&#8451;`;
+    tempMinRow.appendChild(tempMinCell);
+  }
+  tbody.appendChild(tempMinRow);
+
+  // Create temperature min row
+  const tempMaxRow = document.createElement("tr");
+  for (let i = 0; i < 5; i++) {
+    const tempMaxCell = document.createElement("td");
+    tempMaxCell.setAttribute("id", `daily${i + 1}`);
+    tempMaxCell.innerHTML = `${subset[i].tempmin}&#8451;`;
+    tempMaxRow.appendChild(tempMaxCell);
+  }
+  tbody.appendChild(tempMaxRow);
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  tableContainer.appendChild(table);
+}
+
+// Get Icon function for forecasted weather.
+function getIconClass(icon_name) {
+  switch (icon_name) {
+    case "clear-day":
+      return "fa-sun";
+    case "rain":
+      return "fa-cloud-rain";
+    case "cloudy":
+      return "fa-cloud";
+    case "partly-cloudy-day":
+      return "fa-cloud-sun";
+    default:
+      return "";
+  }
+}
+
+// Get Icon function for current weather.
+function getIcon(iconName) {
+  let icon;
+  switch (iconName) {
+    case "clear-day":
+      icon = '<span class="fa-solid fas fa-sun text-success"></span>';
+      break;
+    case "cloudy":
+      icon = '<span class="fa-solid fas fa-cloud text-success"></span>';
+      break;
+    case "rain":
+      icon = '<span class="fa-solid fas fa-cloud-rain text-success"></span>';
+      break;
+    case "snow":
+      icon = '<span class="fa-solid fas fa-snowflake text-success"></span>';
+      break;
+    case "wind":
+      icon = '<span class="fa-solid fas fa-wind text-success"></span>';
+      break;
+    default:
+      icon = '<span class="fa-solid fas fa-cloud-sun text-success"></span>';
+      break;
+  }
+  return icon;
 }
 
 // =================== GET COUNTRY HOLIDAY ====================================================
@@ -350,7 +521,7 @@ function fetchCountryNews() {
     "News in " + $("#countrySelect option:selected").text()
   );
   $.ajax({
-    url: "libs/php/getLatestNews.php",
+    url: "libs/php/getLatestNews1.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -574,4 +745,136 @@ function currencyConversion() {
       console.log("Error");
     },
   });
+}
+
+// CITIES LAYER
+function getCities() {
+  let cCode = $("#countrySelect").val();
+  $.ajax({
+    url: "libs/php/getCitiesInfo.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      iso_a2: cCode,
+    },
+    success: function (results) {
+      const citiesData = results.data;
+      cityLayer.clearLayers();
+      citiesData.forEach((cityData) => {
+        const city = cityMarker(cityData);
+        cityLayer.addLayer(city);
+      });
+      // Add cityLayer to the map
+      cityLayer.addTo(map);
+    },
+    error: function (e, t, o) {
+      console.log("Error fetching cities data from Geonames api"),
+        console.log(e.responseText),
+        console.log(`${t} : ${o}`);
+    },
+  });
+}
+
+function cityMarker(city) {
+  const popupContent = `<b>${
+    city.name
+  }</b><br>Population: ${city.population.toLocaleString()}`;
+  const cityIcon = L.ExtraMarkers.icon({
+    icon: "fa-city",
+    markerColor: "yellow",
+    shape: "circle",
+    prefix: "fa",
+  });
+  return L.marker(L.latLng(city.lat, city.lng), {
+    icon: cityIcon,
+  }).bindPopup(popupContent);
+}
+
+// EARTHQUAKE LAYER
+
+function getEarthQuake() {
+  $.ajax({
+    url: "libs/php/getEarthQuakeInfo.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      north: TerritoryGeo.getBounds()._northEast.lat,
+      east: TerritoryGeo.getBounds()._northEast.lng,
+      south: TerritoryGeo.getBounds()._southWest.lat,
+      west: TerritoryGeo.getBounds()._southWest.lng,
+    },
+    success: function (results) {
+      const earthQuakeData = results.data.earthquakes;
+      quakeLayer.clearLayers();
+      earthQuakeData.forEach((data) => {
+        const earthQuakePoint = earthQuakeMarker(data);
+        quakeLayer.addLayer(earthQuakePoint);
+      });
+      // Add cityLayer to the map
+      quakeLayer.addTo(map);
+    },
+    error: function (e, t, o) {
+      console.log("Error fetching earthquake data from Geonames api"),
+        console.log(e.responseText),
+        console.log(`${t} : ${o}`);
+    },
+  });
+}
+
+function earthQuakeMarker(point) {
+  const t = new Date(point.datetime);
+  const popupContent = `<b>Earthquake</b><br>\nMagnitude: ${
+    point.magnitude
+  }<br> \nDate: ${t.toLocaleString()}`;
+  const cityIcon = L.ExtraMarkers.icon({
+    icon: "fa-bolt",
+    markerColor: "blue-dark",
+    shape: "penta",
+    prefix: "fa",
+  });
+  return L.marker(L.latLng(point.lat, point.lng), {
+    icon: cityIcon,
+  }).bindPopup(popupContent);
+}
+
+// TOPOGRAPHY LAYER
+
+function getGeographicPoint() {
+  let cCode = $("#countrySelect").val();
+  $.ajax({
+    url: "libs/php/getGeographicPoint.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      iso_a2: cCode,
+    },
+    success: function (results) {
+      const topographyData = results.data.geonames;
+      landmarkLayer.clearLayers();
+      topographyData.forEach((data) => {
+        const topographyPoint = geographicMarker(data);
+        landmarkLayer.addLayer(topographyPoint);
+      });
+      // Add cityLayer to the map
+      quakeLayer.addTo(map);
+    },
+    error: function (e, t, o) {
+      console.log("Error fetching geographic data from Geonames api"),
+        console.log(e.responseText),
+        console.log(`${t} : ${o}`);
+    },
+  });
+}
+
+function geographicMarker(point) {
+  const popupContent = `<b>Geographic name</b><br>${point.name}`;
+  const cityIcon = L.ExtraMarkers.icon({
+    icon: "fa-solid fa-tree",
+    markerColor: "blue",
+    shape: "start",
+    prefix: "fa",
+  });
+  return L.marker(L.latLng(point.lat, point.lng), {
+    icon: cityIcon,
+  }).bindPopup(popupContent);
 }
