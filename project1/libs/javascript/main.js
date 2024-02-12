@@ -321,7 +321,7 @@ function fetchCountryInfo() {
 
 function fetchCountryWeather() {
   $("#country-weather-info").html(
-    $("#countrySelect option:selected").text() + " Weather Information today"
+    $("#countrySelect option:selected").text() + " weather information today"
   );
   $.ajax({
     url: "libs/php/getWeatherInfo.php",
@@ -374,7 +374,7 @@ function renderForecastTable(subset) {
   const headerCell = document.createElement("th");
   headerCell.setAttribute("colspan", "5");
   headerCell.classList.add("fw-bold", "fs-4", "text-center");
-  headerCell.textContent = "Five-day weather forecast";
+  headerCell.textContent = "Five-days weather forecast";
   headerRow.appendChild(headerCell);
   thead.appendChild(headerRow);
 
@@ -387,6 +387,8 @@ function renderForecastTable(subset) {
       "en-US",
       { weekday: "short", month: "short", day: "numeric" }
     );
+
+    dateCell.style.fontSize = "0.9rem";
     dateRow.appendChild(dateCell);
   }
   tbody.appendChild(dateRow);
