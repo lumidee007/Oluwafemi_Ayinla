@@ -9,22 +9,17 @@
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
-    />
+    /> 
+    <link rel="stylesheet" href="libs/css/leaflet.extra-markers.min.css" >
+    <link rel="stylesheet" href="libs/css/MarkerCluster.css" />
+    <link rel="stylesheet" href="libs/css/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="libs/css/easybutton.css" />
+    <link rel="stylesheet" href="libs/css/fonts-awesome6/css/all.min.css" />
     <link
+      href="libs/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="libs/css/styles.css" />
+    <link rel="stylesheet" href="libs/css/styles.css" /> 
   </head>
   <body>
     <div id="preloader"></div>
@@ -143,6 +138,10 @@
             ></button>
           </div>
           <div class="modal-body">
+            <div class="d-flex justify-content-center align-items-center ">
+                  <p class="display-1  bg-green" id="weather-icon-today">
+                  </p>
+          </div>
             <table class="table table-striped">
               <tr>
                 <td class="text-center">
@@ -150,7 +149,7 @@
                     class="fa-solid fa-temperature-three-quarters fa-xl text-success"
                   ></i>
                 </td>
-                <td>Temperature</td>
+                <td>Temperature </td>
                 <td class="text-end" id="country-temp"></td>
               </tr>
               <tr>
@@ -161,15 +160,6 @@
                 <td>Pressure</td>
 
                 <td class="text-end" id="country-pressure"></td>
-              </tr>
-              <tr>
-                <td class="text-center">
-                  <i class="fa-solid fa-car fa-xl text-success"></i>
-                </td>
-
-                <td>Humidity</td>
-
-                <td class="text-end" id="country-humidity"></td>
               </tr>
               <tr>
                 <td class="text-center">
@@ -201,6 +191,10 @@
                 <td class="text-end" id="country-weather-direction"></td>
               </tr>
             </table>
+            <!-- <tbody id="table-container" ></tbody> -->
+            <div id="table-container">
+              
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -216,7 +210,7 @@
     </div>
     <!-- COUNTRY HOLIDAY MODAL-->
     <div id="CountryHolidaysInfo" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content bg-success">
           <div class="modal-header">
             <h5
@@ -249,7 +243,7 @@
 
     <!-- COUNTRY NEWS MODAL-->
     <div id="CountryNewsInfo" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content bg-success">
           <div class="modal-header">
             <h5
@@ -266,7 +260,7 @@
             
             </button>
           </div>
-          <div class="modal-body" id="newsContainer">
+          <div class="modal-body" id="newsContainer" style="overflow-y: auto;">
           
           </div>
         </div>
@@ -274,7 +268,7 @@
     </div>
     <!-- CITIES AROUND MODAL -->
     <div id="citiesAroundInfo" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content bg-success">
           <div class="modal-header">
             <h5
@@ -384,20 +378,14 @@
         </div>
       </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
-    <script src="libs/js/jquery-2.2.3.min.js"></script>
+    <script src="libs/javascript/popper.js"></script>
+    <script src="libs/javascript/bootstrap-5.3.2.js"></script>
+    <script src="libs/javascript/leaflet-1.9.4.js"></script>
+    <script src="libs/javascript/MarkerCluster.js"></script>
+    <script src="libs/javascript/leaflet.extra-markers.min.js"></script>
+    <script src="libs/javascript/leaflet.markercluster-src.js"></script>
+    <script src="libs/javascript/leaflet-easybutton-2.js"></script>
+    <script src="libs/javascript/jquery-2.2.3.min.js"></script>
     <script src="libs/javascript/main.js"></script>
   </body>
 </html>
