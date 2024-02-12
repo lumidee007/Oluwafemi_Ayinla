@@ -1,5 +1,4 @@
 let map;
-// let marker;
 let countryName;
 let countryCode;
 let currency_Code;
@@ -7,6 +6,10 @@ let TerritoryGeo;
 let cityLayer;
 let quakeLayer;
 let layerControl;
+let capital;
+let continent;
+let population;
+let area;
 let BoundaryStyling = {
   color: "green",
   weight: 2.9,
@@ -16,7 +19,7 @@ let BoundaryStyling = {
 $(document).ready(function () {
   if ($("#preloader").length) {
     $("#preloader")
-      .delay(1000)
+      .delay(5000)
       .fadeOut("slow", function () {
         $(this).remove();
       });
@@ -50,11 +53,11 @@ function handleCountryChange() {
       TerritoryGeo.addTo(map); //
       map.fitBounds(TerritoryGeo.getBounds());
 
-      fetchCountryWeather();
       fetchCountryInfo();
       fetchCountryHolidays();
       fetchCountryNews();
       fetchCountryCities();
+      fetchCountryWeather();
       currencyConversion();
       getCities();
       getEarthQuake();
@@ -115,7 +118,7 @@ function initializeDefaultCountry() {
 function setNewPosition(position) {
   let latitude = position.coords.latitude;
   let longitude = position.coords.longitude;
-
+  countryName = $("#countrySelect option:selected").text();
   $.ajax({
     url: "libs/php/getLatLong.php",
     type: "GET",
@@ -127,6 +130,7 @@ function setNewPosition(position) {
     success: function (result) {
       countryCode =
         result["data"]["results"][0]["components"]["ISO_3166-1_alpha-2"];
+
       $("#countrySelect").val(countryCode).change();
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -213,7 +217,7 @@ function mapConfig() {
   });
 
   map = L.map("map", {
-    layers: [streets, satellite, EarthAtNight],
+    layers: [streets],
   }).setView([54.5, -4], 6);
 
   let baseMaps = {
@@ -298,7 +302,22 @@ function fetchCountryInfo() {
     success: (result) => {
       if (result.status.name == "ok") {
         $("#infoContainer").empty();
-        currency_Code = result["data"][0]["currencyCode"];
+        let countryInfoData = result["data"][0];
+        let countryCapital = countryInfoData["capital"];
+        let countryContinent = countryInfoData["continentName"];
+        let countryPopulation = parseInt(
+          countryInfoData["population"]
+        ).toLocaleString();
+        let countryArea = parseInt(
+          countryInfoData["areaInSqKm"]
+        ).toLocaleString();
+        let countryCurrency = countryInfoData["currencyCode"];
+        capital = countryCapital;
+        continent = countryContinent;
+        population = countryPopulation;
+        area = countryArea;
+        currency_Code = countryCurrency;
+
         $("#country-name").html($("#countrySelect option:selected").text());
         $("#country-capital").html(result["data"][0]["capital"]);
         $("#country-continent").html(result["data"][0]["continentName"]);
@@ -308,7 +327,7 @@ function fetchCountryInfo() {
         $("#country-area").html(
           parseInt(result["data"][0]["areaInSqKm"]).toLocaleString()
         );
-        $("#country-currency").html(currency_Code);
+        $("#country-currency").html(result["data"][0]["currencyCode"]);
       }
     },
     error: (textStatus, errorThrown) => {
@@ -323,126 +342,134 @@ function fetchCountryWeather() {
   $("#country-weather-info").html(
     $("#countrySelect option:selected").text() + " weather information today"
   );
+  if (countryName == undefined) {
+    countryName = $("#countrySelect option:selected").text();
+  }
   $.ajax({
     url: "libs/php/getWeatherInfo.php",
     type: "GET",
     dataType: "json",
     data: {
-      country: $("#countrySelect option:selected").text(),
+      country: countryName,
     },
     success: function (result) {
       let weatherIcon;
       let icon;
       let weatherSubset;
+      let weatherData;
       if (result.status.name == "ok") {
+        $("#table-container").empty();
+        let weatherResults = result.data.days[0];
         weatherSubset = result.data.days.slice(1, 6);
         weatherIcon = result.data.days[0]["icon"];
         icon = getIcon(weatherIcon);
-        $("#country-temp").html(result.data.days[0]["temp"] + "°C");
-        $("#country-low-temp").html(result.data.days[0]["feelslikemin"] + "°C");
-        $("#country-pressure").html(result.data.days[0]["pressure"] + "°C");
-        $("#country-wind-speed").html(
-          result.data.days[0]["windspeed"] + " m/s"
-        );
-        $("#country-weather-direction").html(
-          result.data.days[0]["description"]
-        );
+        $("#country-temp").html(weatherResults["temp"] + "°C");
+        $("#country-low-temp").html(weatherResults["feelslikemin"] + "°C");
+        $("#country-pressure").html(weatherResults["pressure"] + "°C");
+        $("#country-wind-speed").html(weatherResults["windspeed"] + " m/s");
+        $("#country-weather-direction").html(weatherResults["description"]);
         $("#weather-icon-today").html(icon);
       }
-      renderForecastTable(weatherSubset);
+      weatherData = weatherSubset;
+      renderForecastTable(weatherData);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error getting the get country weather");
     },
   });
-}
 
-function renderForecastTable(subset) {
-  const tableContainer = document.getElementById("table-container");
-  const existingTbody = tableContainer.querySelector("tbody");
-  if (existingTbody) {
-    existingTbody.innerHTML = "";
+  function renderForecastTable(subset) {
+    const tableContainer = document.getElementById("table-container");
+    const table = document.createElement("table");
+    table.classList.add("table");
+
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+
+    const existingTbody = tableContainer.querySelector("tbody");
+    if (existingTbody) {
+      existingTbody.innerHTML = "";
+    }
+    $("#table-container").empty();
+    // Create table header
+    const headerRow = document.createElement("tr");
+    const headerCell = document.createElement("th");
+    headerCell.setAttribute("colspan", "5");
+    headerCell.classList.add("fw-bold", "fs-4", "text-center");
+    headerCell.textContent = "Five-days weather forecast";
+    headerRow.appendChild(headerCell);
+    thead.appendChild(headerRow);
+
+    // Create date header row
+    const dateRow = document.createElement("tr");
+    for (let i = 0; i < 5; i++) {
+      const dateCell = document.createElement("td");
+      dateCell.setAttribute("id", `date${i + 1}`);
+      dateCell.textContent = new Date(subset[i].datetime).toLocaleDateString(
+        "en-US",
+        { weekday: "short", month: "short", day: "numeric" }
+      );
+
+      dateCell.style.fontSize = "0.9em";
+      dateRow.appendChild(dateCell);
+    }
+    tbody.appendChild(dateRow);
+
+    // Create icon row
+    const iconRow = document.createElement("tr");
+    for (let i = 0; i < 5; i++) {
+      const iconCell = document.createElement("td");
+      const icon = document.createElement("span");
+      icon.classList.add("fa-solid", "fa-circle-info", "fa-xl", "text-success");
+      icon.classList.add(getIconClass(subset[i].icon));
+      iconCell.appendChild(icon);
+      iconRow.appendChild(iconCell);
+    }
+    tbody.appendChild(iconRow);
+
+    // Create temperature row
+    const tempMinRow = document.createElement("tr");
+    for (let i = 0; i < 5; i++) {
+      const tempMinCell = document.createElement("td");
+      tempMinCell.setAttribute("id", `daily${i + 1}`);
+      tempMinCell.innerHTML = `${subset[i].temp}&#8451;`;
+      tempMinRow.appendChild(tempMinCell);
+    }
+    tbody.appendChild(tempMinRow);
+
+    // Create temperature min row
+    const tempMaxRow = document.createElement("tr");
+    for (let i = 0; i < 5; i++) {
+      const tempMaxCell = document.createElement("td");
+      tempMaxCell.setAttribute("id", `daily${i + 1}`);
+      tempMaxCell.innerHTML = `${subset[i].tempmin}&#8451;`;
+      tempMaxRow.appendChild(tempMaxCell);
+    }
+    tbody.appendChild(tempMaxRow);
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
   }
-  const table = document.createElement("table");
-  table.classList.add("table");
 
-  const thead = document.createElement("thead");
-  const tbody = document.createElement("tbody");
-
-  // Create table header
-  const headerRow = document.createElement("tr");
-  const headerCell = document.createElement("th");
-  headerCell.setAttribute("colspan", "5");
-  headerCell.classList.add("fw-bold", "fs-4", "text-center");
-  headerCell.textContent = "Five-days weather forecast";
-  headerRow.appendChild(headerCell);
-  thead.appendChild(headerRow);
-
-  // Create date header row
-  const dateRow = document.createElement("tr");
-  for (let i = 0; i < 5; i++) {
-    const dateCell = document.createElement("td");
-    dateCell.setAttribute("id", `date${i + 1}`);
-    dateCell.textContent = new Date(subset[i].datetime).toLocaleDateString(
-      "en-US",
-      { weekday: "short", month: "short", day: "numeric" }
-    );
-
-    dateCell.style.fontSize = "0.9rem";
-    dateRow.appendChild(dateCell);
-  }
-  tbody.appendChild(dateRow);
-
-  // Create icon row
-  const iconRow = document.createElement("tr");
-  for (let i = 0; i < 5; i++) {
-    const iconCell = document.createElement("td");
-    const icon = document.createElement("span");
-    icon.classList.add("fa-solid", "fa-circle-info", "fa-xl", "text-success");
-    icon.classList.add(getIconClass(subset[i].icon));
-    iconCell.appendChild(icon);
-    iconRow.appendChild(iconCell);
-  }
-  tbody.appendChild(iconRow);
-
-  // Create temperature row
-  const tempMinRow = document.createElement("tr");
-  for (let i = 0; i < 5; i++) {
-    const tempMinCell = document.createElement("td");
-    tempMinCell.setAttribute("id", `daily${i + 1}`);
-    tempMinCell.innerHTML = `${subset[i].temp}&#8451;`;
-    tempMinRow.appendChild(tempMinCell);
-  }
-  tbody.appendChild(tempMinRow);
-
-  // Create temperature min row
-  const tempMaxRow = document.createElement("tr");
-  for (let i = 0; i < 5; i++) {
-    const tempMaxCell = document.createElement("td");
-    tempMaxCell.setAttribute("id", `daily${i + 1}`);
-    tempMaxCell.innerHTML = `${subset[i].tempmin}&#8451;`;
-    tempMaxRow.appendChild(tempMaxCell);
-  }
-  tbody.appendChild(tempMaxRow);
-
-  table.appendChild(thead);
-  table.appendChild(tbody);
-  tableContainer.appendChild(table);
-}
-
-// Get Icon function for forecasted weather.
-function getIconClass(icon_name) {
-  switch (icon_name) {
-    case "clear-day":
-      return "fa-sun";
-    case "rain":
-      return "fa-cloud-rain";
-    case "cloudy":
-      return "fa-cloud";
-    case "partly-cloudy-day":
-      return "fa-cloud-sun";
-    default:
-      return "";
+  // Get Icon function for forecasted weather.
+  function getIconClass(icon_name) {
+    switch (icon_name) {
+      case "clear-day":
+        return "fa-sun";
+      case "snow":
+        return "fa-snowflake";
+      case "rain":
+        return "fa-cloud-rain";
+      case "cloudy":
+        return "fa-cloud";
+      case "partly-cloudy-day":
+        return "fa-cloud-sun";
+      case "wind":
+        return "fa-wind";
+      default:
+        return "";
+    }
   }
 }
 
