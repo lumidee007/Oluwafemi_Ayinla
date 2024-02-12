@@ -521,7 +521,7 @@ function fetchCountryNews() {
     "News in " + $("#countrySelect option:selected").text()
   );
   $.ajax({
-    url: "libs/php/getLatestNews1.php",
+    url: "libs/php/getLatestNews.php",
     type: "POST",
     dataType: "json",
     data: {
