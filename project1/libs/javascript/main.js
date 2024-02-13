@@ -26,7 +26,9 @@ $(document).ready(function () {
 
     mapConfig();
     getCountryList();
+
     updateCurrentLocation();
+
     $("#countrySelect").change(handleCountryChange);
   }
 });
@@ -34,6 +36,7 @@ $(document).ready(function () {
 function handleCountryChange() {
   countryName = $("#countrySelect option:selected").text();
   let country = countryName;
+  let country_code = this.value;
 
   $.ajax({
     url: "libs/php/getCountryBorder.php",
@@ -53,11 +56,10 @@ function handleCountryChange() {
       TerritoryGeo.addTo(map); //
       map.fitBounds(TerritoryGeo.getBounds());
 
-      fetchCountryInfo();
+      fetchCountryInfo(country_code);
       fetchCountryHolidays();
       fetchCountryNews();
       fetchCountryCities();
-      fetchCountryWeather();
       currencyConversion();
       getCities();
       getEarthQuake();
@@ -287,7 +289,7 @@ function mapConfig() {
 }
 
 // =================== GET COUNTRY INFO ====================================================
-function fetchCountryInfo() {
+function fetchCountryInfo(countryC) {
   $("#country-information").html(
     $("#countrySelect option:selected").text() + " main information"
   );
@@ -296,14 +298,15 @@ function fetchCountryInfo() {
     type: "POST",
     dataType: "json",
     data: {
-      country_code: $("#countrySelect").val(),
+      // country_code: $("#countrySelect").val(),
+      country_code: countryC,
     },
 
     success: (result) => {
       if (result.status.name == "ok") {
         $("#infoContainer").empty();
         let countryInfoData = result["data"][0];
-        let countryCapital = countryInfoData["capital"];
+        let capitals = result["data"][0]["capital"];
         let countryContinent = countryInfoData["continentName"];
         let countryPopulation = parseInt(
           countryInfoData["population"]
@@ -312,7 +315,7 @@ function fetchCountryInfo() {
           countryInfoData["areaInSqKm"]
         ).toLocaleString();
         let countryCurrency = countryInfoData["currencyCode"];
-        capital = countryCapital;
+        // capital = countryCapital;
         continent = countryContinent;
         population = countryPopulation;
         area = countryArea;
@@ -328,6 +331,7 @@ function fetchCountryInfo() {
           parseInt(result["data"][0]["areaInSqKm"]).toLocaleString()
         );
         $("#country-currency").html(result["data"][0]["currencyCode"]);
+        fetchCountryWeather(capitals);
       }
     },
     error: (textStatus, errorThrown) => {
@@ -338,7 +342,7 @@ function fetchCountryInfo() {
 
 // =================== GET COUNTRY WEATHER ====================================================
 
-function fetchCountryWeather() {
+function fetchCountryWeather(cc) {
   $("#country-weather-info").html(
     $("#countrySelect option:selected").text() + " weather information today"
   );
@@ -350,7 +354,7 @@ function fetchCountryWeather() {
     type: "GET",
     dataType: "json",
     data: {
-      country: countryName,
+      country: cc,
     },
     success: function (result) {
       let weatherIcon;
