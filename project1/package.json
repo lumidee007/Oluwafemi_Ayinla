@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "leaflet-extra-markers": "^1.2.2"
+  }
+}
