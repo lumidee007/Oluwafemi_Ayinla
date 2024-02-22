@@ -11,15 +11,15 @@ let continent;
 let population;
 let area;
 let BoundaryStyling = {
-  color: "green",
-  weight: 2.9,
+  color: "darkred",
+  weight: 3.9,
   opacity: 0.55,
 };
 
 $(document).ready(function () {
   if ($("#preloader").length) {
     $("#preloader")
-      .delay(5000)
+      .delay(3500)
       .fadeOut("slow", function () {
         $(this).remove();
       });
@@ -59,7 +59,6 @@ function handleCountryChange() {
       fetchCountryInfo(country_code);
       fetchCountryHolidays();
       fetchCountryNews();
-      fetchCountryCities();
       currencyConversion();
       getCities();
       getEarthQuake();
@@ -169,7 +168,7 @@ function mapConfig() {
         [85.0511287776, 179.999999975],
       ],
       minZoom: 1,
-      maxZoom: 8,
+      maxZoom: 19,
       format: "jpg",
       time: "",
       tilematrixset: "GoogleMapsCompatible_Level",
@@ -177,44 +176,32 @@ function mapConfig() {
   );
 
   cityLayer = L.markerClusterGroup({
-    iconCreateFunction: function (e) {
-      return (
-        (icon = '<span class="fas fa-city"></span>'),
-        new L.DivIcon({
-          html:
-            "<div><span>" + icon + "<br>" + e.getChildCount() + "</span></div>",
-          className: "marker-cluster marker-cluster-small marker-cluster-city",
-          iconSize: new L.Point(40, 40),
-        })
-      );
+    polygonOptions: {
+      fillColor: "#fff",
+      color: "#fff",
+      weight: 1.5,
+      opacity: 0.8,
+      fillOpacity: 0.5,
     },
   });
 
   quakeLayer = L.markerClusterGroup({
-    iconCreateFunction: function (e) {
-      return (
-        (icon = '<span class="fas fa-bolt"></span>'),
-        new L.DivIcon({
-          html:
-            "<div><span>" + icon + "<br>" + e.getChildCount() + "</span></div>",
-          className: "marker-cluster marker-cluster-small marker-cluster-quake",
-          iconSize: new L.Point(40, 40),
-        })
-      );
+    polygonOptions: {
+      fillColor: "#fff",
+      color: "#fff",
+      weight: 1.5,
+      opacity: 0.8,
+      fillOpacity: 0.5,
     },
   });
 
   landmarkLayer = L.markerClusterGroup({
-    iconCreateFunction: function (e) {
-      return (
-        (icon = '<span class="fa-solid fas fa-tree"></span>'),
-        new L.DivIcon({
-          html:
-            "<div><span>" + icon + "<br>" + e.getChildCount() + "</span></div>",
-          className: "marker-cluster marker-cluster-small marker-cluster-quake",
-          iconSize: new L.Point(40, 40),
-        })
-      );
+    polygonOptions: {
+      fillColor: "#fff",
+      color: "#fff",
+      weight: 1.5,
+      opacity: 0.8,
+      fillOpacity: 0.5,
     },
   });
 
@@ -239,37 +226,43 @@ function mapConfig() {
 
   //DEFINE ALL MODALS
 
-  L.easyButton("fa-solid fa-info fa-lg text-success", function (btn, map) {
-    $("#countryMainInfo").modal("show");
-  }).addTo(map);
-
-  L.easyButton("fa-solid fa-cloud fa-lg text-success", function (btn, map) {
-    $("#countryWeatherInfo").modal("show");
-  }).addTo(map);
+  L.easyButton(
+    "fa-solid fa-info fa-lg text-success text-center",
+    function (btn, map) {
+      $("#countryMainInfo").modal("show");
+    }
+  ).addTo(map);
 
   L.easyButton(
-    "fa-solid fa-umbrella-beach fa-lg text-success",
+    "fa-solid fa-cloud fa-lg text-success text-center",
+    function (btn, map) {
+      $("#countryWeatherInfo").modal("show");
+    }
+  ).addTo(map);
+
+  L.easyButton(
+    "fa-solid fa-umbrella-beach fa-lg text-success text-center",
     function (btn, map) {
       $("#CountryHolidaysInfo").modal("show");
     }
   ).addTo(map);
 
   L.easyButton(
-    "fa-solid fa-regular fa-newspaper fa-lg text-success",
+    "fa-solid fa-lg fa-newspaper fa-lg text-success text-center",
     function (btn, map) {
       $("#CountryNewsInfo").modal("show");
     }
   ).addTo(map);
 
   L.easyButton(
-    "fa-solid fa-regular fa-city fa-lg text-success",
+    "fa-solid fa-lg fa-city fa-lg text-success text-center",
     function (btn, map) {
       $("#citiesAroundInfo").modal("show");
     }
   ).addTo(map);
 
   L.easyButton(
-    "fa-solid fa-regular fa-money-bill fa-lg text-success",
+    "fa-solid fa-lg fa-money-bill fa-lg text-success text-center",
     function (btn, map) {
       $("#country-currency-conversion").modal("show");
     }
@@ -277,7 +270,7 @@ function mapConfig() {
 
   // Random easy button to change country
   L.easyButton(
-    "fa-solid fa-rotate-right fa-lg text-success",
+    "fa-solid fa-rotate-right fa-lg text-success text-center",
     function (btn, map) {
       const list = $("#countrySelect option");
       const rand = Math.floor(Math.random() * list.length) + 1;
@@ -332,6 +325,7 @@ function fetchCountryInfo(countryC) {
         );
         $("#country-currency").html(result["data"][0]["currencyCode"]);
         fetchCountryWeather(capitals);
+        fetchNearbyLocation(capitals);
       }
     },
     error: (textStatus, errorThrown) => {
@@ -341,10 +335,16 @@ function fetchCountryInfo(countryC) {
 }
 
 // =================== GET COUNTRY WEATHER ====================================================
+// Temperature conversion to celsius
+const fahrenheitToCelsius = (fahrenheit) =>
+  Math.round(((fahrenheit - 32) * 5) / 9);
+
+// speed conversion to mph
+const msToMph = (metersPerSecond) => Math.round(metersPerSecond * 2.23694);
 
 function fetchCountryWeather(cc) {
   $("#country-weather-info").html(
-    $("#countrySelect option:selected").text() + " weather information today"
+    cc + ", " + $("#countrySelect option:selected").text()
   );
   if (countryName == undefined) {
     countryName = $("#countrySelect option:selected").text();
@@ -367,10 +367,17 @@ function fetchCountryWeather(cc) {
         weatherSubset = result.data.days.slice(1, 6);
         weatherIcon = result.data.days[0]["icon"];
         icon = getIcon(weatherIcon);
-        $("#country-temp").html(weatherResults["temp"] + "°C");
-        $("#country-low-temp").html(weatherResults["feelslikemin"] + "°C");
+        let tempConversionToCelsius = fahrenheitToCelsius(
+          weatherResults["temp"]
+        );
+        let minTempConversionToCelsius = fahrenheitToCelsius(
+          weatherResults["feelslikemin"]
+        );
+        let windSpeedInMph = msToMph(weatherResults["windspeed"]);
+        $("#country-temp").html(tempConversionToCelsius + "°C");
+        $("#country-low-temp").html(minTempConversionToCelsius + "°C");
         $("#country-pressure").html(weatherResults["pressure"] + "°C");
-        $("#country-wind-speed").html(weatherResults["windspeed"] + " m/s");
+        $("#country-wind-speed").html(windSpeedInMph + "mph");
         $("#country-weather-direction").html(weatherResults["description"]);
         $("#weather-icon-today").html(icon);
       }
@@ -400,7 +407,6 @@ function fetchCountryWeather(cc) {
     const headerCell = document.createElement("th");
     headerCell.setAttribute("colspan", "5");
     headerCell.classList.add("fw-bold", "fs-4", "text-center");
-    headerCell.textContent = "Five-days weather forecast";
     headerRow.appendChild(headerCell);
     thead.appendChild(headerRow);
 
@@ -408,11 +414,26 @@ function fetchCountryWeather(cc) {
     const dateRow = document.createElement("tr");
     for (let i = 0; i < 5; i++) {
       const dateCell = document.createElement("td");
+      // let daySuffix = "";
       dateCell.setAttribute("id", `date${i + 1}`);
-      dateCell.textContent = new Date(subset[i].datetime).toLocaleDateString(
-        "en-US",
-        { weekday: "short", month: "short", day: "numeric" }
-      );
+
+      const currentDate = new Date(subset[i].datetime);
+      const options = {
+        weekday: "short",
+      };
+      const dateStr = currentDate.toLocaleDateString("en-US", options);
+
+      let daySuffix = "th";
+      const day = currentDate.getDate();
+      if (day === 1 || day === 21 || day === 31) {
+        daySuffix = "st";
+      } else if (day === 3 || day === 23) {
+        daySuffix = "rd";
+      } else if (day === 7 || day === 17 || day === 27) {
+        daySuffix = "th";
+      }
+
+      dateCell.textContent = `${dateStr}, ${day}${daySuffix}`;
 
       dateCell.style.fontSize = "0.9em";
       dateRow.appendChild(dateCell);
@@ -424,7 +445,7 @@ function fetchCountryWeather(cc) {
     for (let i = 0; i < 5; i++) {
       const iconCell = document.createElement("td");
       const icon = document.createElement("span");
-      icon.classList.add("fa-solid", "fa-circle-info", "fa-xl", "text-success");
+      icon.classList.add("fa-solid", "fa-circle-info", "fa-xl", "text-primary");
       icon.classList.add(getIconClass(subset[i].icon));
       iconCell.appendChild(icon);
       iconRow.appendChild(iconCell);
@@ -436,7 +457,9 @@ function fetchCountryWeather(cc) {
     for (let i = 0; i < 5; i++) {
       const tempMinCell = document.createElement("td");
       tempMinCell.setAttribute("id", `daily${i + 1}`);
-      tempMinCell.innerHTML = `${subset[i].temp}&#8451;`;
+      tempMinCell.setAttribute("class", `fs-5`);
+      // tempMinCell.innerHTML = `${subset[i].temp}&#8451;`;
+      tempMinCell.innerHTML = `${fahrenheitToCelsius(subset[i].temp)}&#8451;`;
       tempMinRow.appendChild(tempMinCell);
     }
     tbody.appendChild(tempMinRow);
@@ -446,7 +469,10 @@ function fetchCountryWeather(cc) {
     for (let i = 0; i < 5; i++) {
       const tempMaxCell = document.createElement("td");
       tempMaxCell.setAttribute("id", `daily${i + 1}`);
-      tempMaxCell.innerHTML = `${subset[i].tempmin}&#8451;`;
+      tempMaxCell.setAttribute("class", `fs-6 fw-light`);
+      tempMaxCell.innerHTML = `${fahrenheitToCelsius(
+        subset[i].tempmin
+      )}&#8451;`;
       tempMaxRow.appendChild(tempMaxCell);
     }
     tbody.appendChild(tempMaxRow);
@@ -482,22 +508,22 @@ function getIcon(iconName) {
   let icon;
   switch (iconName) {
     case "clear-day":
-      icon = '<span class="fa-solid fas fa-sun text-success"></span>';
+      icon = '<span class="fa-solid fas fa-sun text-primary"></span>';
       break;
     case "cloudy":
-      icon = '<span class="fa-solid fas fa-cloud text-success"></span>';
+      icon = '<span class="fa-solid fas fa-cloud text-primary"></span>';
       break;
     case "rain":
-      icon = '<span class="fa-solid fas fa-cloud-rain text-success"></span>';
+      icon = '<span class="fa-solid fas fa-cloud-rain text-primary"></span>';
       break;
     case "snow":
-      icon = '<span class="fa-solid fas fa-snowflake text-success"></span>';
+      icon = '<span class="fa-solid fas fa-snowflake text-primary"></span>';
       break;
     case "wind":
-      icon = '<span class="fa-solid fas fa-wind text-success"></span>';
+      icon = '<span class="fa-solid fas fa-wind text-primary"></span>';
       break;
     default:
-      icon = '<span class="fa-solid fas fa-cloud-sun text-success"></span>';
+      icon = '<span class="fa-solid fas fa-cloud-sun text-primary"></span>';
       break;
   }
   return icon;
@@ -506,11 +532,8 @@ function getIcon(iconName) {
 // =================== GET COUNTRY HOLIDAY ====================================================
 function fetchCountryHolidays() {
   let cCode = $("#countrySelect").val();
-  $("#country-holiday-info").html(
-    "National holidays in " +
-      $("#countrySelect option:selected").text() +
-      " for 2024"
-  );
+
+  $("#country-holiday-info").html("National holidays");
   $.ajax({
     url: "https://date.nager.at/api/v3/PublicHolidays/2024/" + cCode,
     type: "GET",
@@ -550,9 +573,7 @@ function fetchCountryHolidays() {
 
 // =================== GET COUNTRY NEWS ====================================================
 function fetchCountryNews() {
-  $("#newsFeedCountry").html(
-    "News in " + $("#countrySelect option:selected").text()
-  );
+  $("#newsFeedCountry").html("BREAKING NEWS");
   $.ajax({
     url: "libs/php/getLatestNews.php",
     type: "POST",
@@ -564,23 +585,23 @@ function fetchCountryNews() {
     success: (result) => {
       if (result.status.name == "ok") {
         $("#newsContainer").empty();
-
         var articles = result.data.articles;
         $.each(articles, function (index, article) {
           var newsArticle = `
-          <div class="card mb-3">
+          <div class="card mb-3 card-shadow">
             <div class="card-body">
-              <h5 class="card-title">${article.title}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">${article.author}</h6>
-              <h6 class="card-subtitle mb-2 text-muted">${
+              <h5 class="card-title fs-6 "><a  href="${
+                article.url
+              }" class="card-link text-decoration-none" target="_blank">${
+            article.title
+          }<a></h5>
+              
+              <h6 class="card-subtitle my-2 text-muted">Source: ${
                 article.source.name
               }</h6>
-              <p class="card-text">Published At: ${new Date(
+              <p class="card-text fs-6 fw-light">Published: ${timeAgo(
                 article.publishedAt
-              ).toLocaleDateString()}</p>
-              <a href="${
-                article.url
-              }" class="card-link" target="_blank">Read More</a>
+              )}</p>
             </div>
           </div>
         `;
@@ -594,20 +615,40 @@ function fetchCountryNews() {
   });
 }
 
-// =================== GET CITIES AROUND ====================================================
-function fetchCountryCities() {
+function timeAgo(publishedAt) {
+  const currentDate = new Date();
+  const publishedDate = new Date(publishedAt);
+  const timeDifference = currentDate - publishedDate;
+
+  const seconds = Math.floor(timeDifference / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 0) {
+    return `${days} day${days !== 1 ? "s" : ""} ago`;
+  } else if (hours > 0) {
+    return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+  } else {
+    return `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
+  }
+}
+
+// =================== LOCATIONS ====================================================
+
+function fetchNearbyLocation(capital) {
   let cCode = $("#countrySelect").val();
   $.ajax({
     url: "libs/php/getWikipediaSearch.php",
     type: "POST",
     dataType: "json",
     data: {
-      country: cCode,
+      country: capital,
     },
     success: function (data) {
-      $("#cities-around-country").html(
-        "Cities Around " + $("#countrySelect option:selected").text()
-      );
+      $("#cities-around-country").html("Nearby location");
       var filteredData = data.data.filter(function (item) {
         return item.countryCode === cCode;
       });
@@ -637,9 +678,10 @@ function displayData(data) {
 // =================== GET CURRENCY CONVERSION ====================================================
 
 function currencyConversion() {
-  $("#info-country").html(
-    $("#countrySelect option:selected").text() + " currency converter"
-  );
+  // $("#info-country").html(
+  //   $("#countrySelect option:selected").text() + " currency converter"
+  // );
+  $("#info-country").html("Currency calculator");
   // Fetch currency names
   $.ajax({
     url: "https://openexchangerates.org/api/currencies.json?show_alternative=0&show_inactive=0",
@@ -674,9 +716,9 @@ function currencyConversion() {
 
             // Add selected country's currency name to the modal
             const selectedCurrencyName = data[selected_Currency_Code];
-            $("#info-country").html(
-              selectedCurrencyName + " currency converter"
-            );
+            // $("#info-country").html(
+            //   selectedCurrencyName + " currency converter"
+            // );
 
             $("#local-currency-code").text(selected_Currency_Code);
             $("#local-currency").attr("name", "local-currency");
@@ -813,14 +855,15 @@ function cityMarker(city) {
     city.name
   }</b><br>Population: ${city.population.toLocaleString()}`;
   const cityIcon = L.ExtraMarkers.icon({
-    icon: "fa-city",
-    markerColor: "yellow",
-    shape: "circle",
     prefix: "fa",
+    icon: " fa-city",
+    iconColor: "white",
+    markerColor: "yellow",
+    shape: "square",
   });
   return L.marker(L.latLng(city.lat, city.lng), {
     icon: cityIcon,
-  }).bindPopup(popupContent);
+  }).bindTooltip(popupContent, { direction: "top", sticky: true });
 }
 
 // EARTHQUAKE LAYER
@@ -860,14 +903,15 @@ function earthQuakeMarker(point) {
     point.magnitude
   }<br> \nDate: ${t.toLocaleString()}`;
   const cityIcon = L.ExtraMarkers.icon({
-    icon: "fa-bolt",
-    markerColor: "blue-dark",
-    shape: "penta",
     prefix: "fa",
+    icon: "fa-bolt",
+    iconColor: "black",
+    markerColor: "white",
+    shape: "circle",
   });
   return L.marker(L.latLng(point.lat, point.lng), {
     icon: cityIcon,
-  }).bindPopup(popupContent);
+  }).bindTooltip(popupContent, { direction: "top", sticky: true });
 }
 
 // TOPOGRAPHY LAYER
@@ -902,12 +946,13 @@ function getGeographicPoint() {
 function geographicMarker(point) {
   const popupContent = `<b>Geographic name</b><br>${point.name}`;
   const cityIcon = L.ExtraMarkers.icon({
-    icon: "fa-solid fa-tree",
-    markerColor: "blue",
-    shape: "start",
     prefix: "fa",
+    icon: "fa-tree",
+    iconColor: "white",
+    markerColor: "green",
+    shape: "circle",
   });
   return L.marker(L.latLng(point.lat, point.lng), {
     icon: cityIcon,
-  }).bindPopup(popupContent);
+  }).bindTooltip(popupContent, { direction: "top", sticky: true });
 }

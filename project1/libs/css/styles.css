@@ -39,6 +39,31 @@ body {
 .lighter-bg-success {
   background-color: #d1e7dd;
 }
+.yellow {
+  color: yellow;
+}
+.blue {
+  color: blue;
+}
+
+.red {
+  color: red;
+}
+
+.card-shadow {
+  box-shadow: 1px 1px 1px 1px rgb(234, 45, 45);
+  margin: 1rem;
+}
+.fromCurrency {
+  color: gray;
+  font-size: 0.8rem;
+  margin-bottom: -1.4rem;
+  margin-left: 0.8rem;
+}
+
+.leaflet-touch .leaflet-control-layers-toggle {
+  background-image: url(../../node_modules/leaflet/dist/images/layers-2x.png) !important;
+}
 
 .city-summary {
   max-width: 200px;
@@ -91,5 +116,21 @@ body {
   100% {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .fromCurrency {
+    font-size: 0.7rem;
+    margin-bottom: -1rem;
+    margin-left: 0.5rem;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .fromCurrency {
+    font-size: 0.75rem;
+    margin-bottom: -1.2rem;
+    margin-left: 0.7rem;
   }
 }
