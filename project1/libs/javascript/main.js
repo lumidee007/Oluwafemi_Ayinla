@@ -435,7 +435,7 @@ function fetchCountryWeather(cc) {
 
       dateCell.textContent = `${dateStr}, ${day}${daySuffix}`;
 
-      dateCell.style.fontSize = "0.9em";
+      dateCell.setAttribute("class", `fs-7 text-center`);
       dateRow.appendChild(dateCell);
     }
     tbody.appendChild(dateRow);
@@ -444,6 +444,7 @@ function fetchCountryWeather(cc) {
     const iconRow = document.createElement("tr");
     for (let i = 0; i < 5; i++) {
       const iconCell = document.createElement("td");
+      iconCell.setAttribute("class", `text-center`);
       const icon = document.createElement("span");
       icon.classList.add("fa-solid", "fa-circle-info", "fa-xl", "text-primary");
       icon.classList.add(getIconClass(subset[i].icon));
@@ -457,7 +458,7 @@ function fetchCountryWeather(cc) {
     for (let i = 0; i < 5; i++) {
       const tempMinCell = document.createElement("td");
       tempMinCell.setAttribute("id", `daily${i + 1}`);
-      tempMinCell.setAttribute("class", `fs-5`);
+      tempMinCell.setAttribute("class", `fs-5 text-center`);
       // tempMinCell.innerHTML = `${subset[i].temp}&#8451;`;
       tempMinCell.innerHTML = `${fahrenheitToCelsius(subset[i].temp)}&#8451;`;
       tempMinRow.appendChild(tempMinCell);
@@ -469,7 +470,7 @@ function fetchCountryWeather(cc) {
     for (let i = 0; i < 5; i++) {
       const tempMaxCell = document.createElement("td");
       tempMaxCell.setAttribute("id", `daily${i + 1}`);
-      tempMaxCell.setAttribute("class", `fs-6 fw-light`);
+      tempMaxCell.setAttribute("class", `fs-6 fw-light text-center`);
       tempMaxCell.innerHTML = `${fahrenheitToCelsius(
         subset[i].tempmin
       )}&#8451;`;
@@ -533,7 +534,15 @@ function getIcon(iconName) {
 function fetchCountryHolidays() {
   let cCode = $("#countrySelect").val();
 
-  $("#country-holiday-info").html("National holidays");
+  function getCurrentYear() {
+    const today = new Date();
+    const year = today.getFullYear();
+    return year;
+  }
+  const currentYear = getCurrentYear();
+
+  $("#country-holiday-info").html("National holidays " + currentYear);
+
   $.ajax({
     url: "https://date.nager.at/api/v3/PublicHolidays/2024/" + cCode,
     type: "GET",
@@ -550,17 +559,19 @@ function fetchCountryHolidays() {
         result.forEach(function (holidayEvent) {
           var holidayDate = new Date(holidayEvent.date);
           var formattedDate = holidayDate.toLocaleDateString("en-US", {
-            year: "numeric",
             month: "long",
             day: "numeric",
           });
 
           $("#tableContainer").append(
-            "<tr><td>" +
+            "<tr>" +
+              "<td>" +
               holidayEvent.name +
-              "</td><td>" +
+              "</td>" +
+              "<td class='d-flex justify-content-center'>" +
               formattedDate +
-              "</td></tr>"
+              "</td>" +
+              "</tr>"
           );
         });
       }
