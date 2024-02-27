@@ -1,6 +1,6 @@
 $(document).ready(function () {
   getAllUsers();
-  // getAllDepartment();
+  getAllDepartment();
   getAllLocations();
 });
 
@@ -121,25 +121,88 @@ function getAllUsers() {
   });
 }
 
-// function getAllDepartment() {
-//   // Generate all user data for the table
-//   $.ajax({
-//     type: "GET",
-//     url: "libs/php/getAllDepartments.php",
-//     // data: {},
-//     dataType: "json",
-//     async: false,
-//     success: function (results) {
-//       // Update Main HTML Table
-//       let data = results["data"];
+function getAllDepartment() {
+  // Generate all user data for the table
+  $.ajax({
+    type: "GET",
+    url: "libs/php/getAllDepartments.php",
+    // data: {},
+    dataType: "json",
+    async: false,
+    success: function (results) {
+      // Update Main HTML Table
+      let data = results["data"];
 
-//       console.log(data);
-//     },
-//     error: function (jqXHR, textStatus, errorThrown) {
-//       console.log(errorThrown);
-//     },
-//   });
-// }
+      console.log(data);
+      const table = document.getElementById("department-table-body");
+
+      // Loop through the data and append each name and location to a new row in the table
+      data.forEach((item) => {
+        // Create a new table row
+        const row = document.createElement("tr");
+
+        // Create the name cell
+        const nameCell = document.createElement("td");
+        nameCell.classList.add("align-middle", "text-nowrap");
+        nameCell.textContent = item.name;
+
+        // Create the location cell
+        const locationCell = document.createElement("td");
+        locationCell.classList.add(
+          "align-middle",
+          "text-nowrap",
+          "d-none",
+          "d-md-table-cell"
+        );
+        locationCell.textContent = item.location;
+
+        // Create the button cell
+        const buttonCell = document.createElement("td");
+        buttonCell.classList.add("align-middle", "text-end", "text-nowrap");
+
+        // Create the edit button
+        const editButton = document.createElement("button");
+        editButton.setAttribute("type", "button");
+        editButton.classList.add("btn", "btn-primary", "btn-sm", "me-1");
+        editButton.setAttribute("data-bs-toggle", "modal");
+        editButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
+        editButton.setAttribute("data-id", item.id);
+        const editIcon = document.createElement("i");
+        editIcon.classList.add("fa-solid", "fa-pencil", "fa-fw");
+        editButton.appendChild(editIcon);
+
+        // Create the delete button
+        const deleteButton = document.createElement("button");
+        deleteButton.setAttribute("type", "button");
+        deleteButton.classList.add(
+          "btn",
+          "btn-primary",
+          "btn-sm",
+          "deleteDepartmentBtn"
+        );
+        deleteButton.setAttribute("data-id", item.id);
+        const deleteIcon = document.createElement("i");
+        deleteIcon.classList.add("fa-solid", "fa-trash", "fa-fw");
+        deleteButton.appendChild(deleteIcon);
+
+        // Append buttons to the button cell
+        buttonCell.appendChild(editButton);
+        buttonCell.appendChild(deleteButton);
+
+        // Append cells to the row
+        row.appendChild(nameCell);
+        row.appendChild(locationCell);
+        row.appendChild(buttonCell);
+
+        // Append row to the table
+        table.appendChild(row);
+      });
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log(errorThrown);
+    },
+  });
+}
 
 function getAllLocations() {
   // Generate all user data for the table
