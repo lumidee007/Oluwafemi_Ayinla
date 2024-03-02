@@ -25,12 +25,15 @@
           </div>
           <div class="col-6 text-end me-2">
             <div class="btn-group" role="group" aria-label="buttons">
+              <!-- refresh Button -->
               <button id="refreshBtn" type="button" class="btn btn-primary">
                 <i class="fa-solid fa-refresh fa-fw"></i>
               </button>
+              <!-- filter Button -->
               <button id="filterBtn" type="button" class="btn btn-primary">
                 <i class="fa-solid fa-filter fa-fw"></i>
               </button>
+              <!-- Add Button -->
               <button id="addBtn" type="button" class="btn btn-primary">
                 <i class="fa-solid fa-plus fa-fw"></i>
               </button>
@@ -142,6 +145,103 @@
       <!-- closing footer -->
     </section>
 
+    <!-- ================================PERSONNEL SECTION================================================== -->
+    <!-- Add Personnel Modal start -->
+    <div id="addPersonnelModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h5 class="modal-title">Add employee</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="addPersonnelForm">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  placeholder="First name"
+                  required
+                />
+                <label for="firstName">First name</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  placeholder="Last name"
+                  required
+                />
+                <label for="lastName">Last name</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="jobTitle"
+                  placeholder="Job title"
+                />
+                <label for="jobTitle">Job Title</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="emailAddress"
+                  placeholder="Email address"
+                  required
+                />
+                <label for="emailAddress">Email Address</label>
+              </div>
+
+              <div class="form-floating">
+                <select
+                  class="form-select"
+                  id="department"
+                  placeholder="Department"
+                  required
+                >
+                  <!-- <option value="" selected>Select department</option> -->
+                </select>
+                <label for="department">Department</label>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="submit"
+              form="addPersonnelForm"
+              class="btn btn-outline-primary btn-sm myBtn"
+            >
+              SAVE
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Personnel Modal start -->
+
     <!-- Personnel Edit Modal start -->
     <div
       div
@@ -247,6 +347,69 @@
     </div>
     <!-- Personnel Edit Modal End -->
 
+    <!-- ================================DEPARTMENT SECTION================================================== -->
+    <!-- Add Department Modal start -->
+    <div id="addDepartmentModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h5 class="modal-title">Add department</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="addDepartmentForm">
+              <input type="hidden" id="addDepartmentID" />
+
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="addDepartmentName"
+                  placeholder="Name"
+                  required
+                />
+                <label for="addDepartmentName">Name</label>
+              </div>
+
+              <div class="form-floating">
+                <select
+                  class="form-select"
+                  id="addDepartmentLocation"
+                  placeholder="Location"
+                ></select>
+                <label for="addDepartmentLocation">Location</label>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="submit"
+              form="addDepartmentForm"
+              class="btn btn-outline-primary btn-sm myBtn"
+            >
+              SAVE
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Add Department Modal end -->
     <!-- Department Edit Modal start -->
     <div id="editDepartmentModal" class="modal fade">
       <div
@@ -310,6 +473,60 @@
     </div>
     <!-- Department Edit Modal End -->
 
+    <!-- ================================LOCATION SECTION================================================== -->
+    <!-- Add location Modal End -->
+    <div id="addLocationModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h5 class="modal-title">Add location</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="addLocationForm">
+              <input type="hidden" id="addLocationID" />
+
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="addLocationName"
+                  placeholder="Name"
+                  required
+                />
+                <label for="addLocationName">Location</label>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="submit"
+              form="addLocationForm"
+              class="btn btn-outline-primary btn-sm myBtn"
+            >
+              SAVE
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Location Edit Modal start -->
     <div
       id="editLocationModal"
@@ -371,9 +588,44 @@
     </div>
     <!-- Location Edit Modal End -->
 
+    <!-- <div
+      class="modal fade"
+      id="successModal"
+      tabindex="-1"
+      aria-labelledby="successModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="successModalLabel">Success</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Data has been successfully added to the database.
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
     <!-- ======== BODY END ================================= -->
 
-    <script src="libs/javascript/jquery3.7.1.js"></script>
+    <!-- <script src="libs/javascript/jquery3.7.1.js"></script> -->
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="libs/javascript/jquery-2.2.3.min.js"></script>
     <script src="libs/javascript/bootstrap-5.3.2.js"></script>
     <script src="libs/javascript/font-awesome6.4.0.all.min.js"></script>
