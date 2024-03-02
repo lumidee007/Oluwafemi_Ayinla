@@ -100,37 +100,7 @@
           tabindex="0"
         >
           <table class="table table-hover">
-            <tr>
-              <td class="align-middle text-nowrap">Ace, Tamarra</td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                Support
-              </td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                Munich
-              </td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                tacem@vinaora.com
-              </td>
-
-              <td class="text-end text-nowrap">
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#editPersonnelModal"
-                  data-id="23"
-                >
-                  <i class="fa-solid fa-pencil fa-fw"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm deletePersonnelBtn"
-                  data-id="23"
-                >
-                  <i class="fa-solid fa-trash fa-fw"></i>
-                </button>
-              </td>
-            </tr>
+            <tbody id="personnel-table-body"></tbody>
           </table>
         </div>
         <!-- closing Tab panel for personnel -->
@@ -144,30 +114,7 @@
           tabindex="0"
         >
           <table class="table table-hover">
-            <tr>
-              <td class="align-middle text-nowrap">Human resources</td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                London
-              </td>
-              <td class="align-middle text-end text-nowrap">
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteDepartmentModal"
-                  data-id="1"
-                >
-                  <i class="fa-solid fa-pencil fa-fw"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm deleteDepartmentBtn"
-                  data-id="1"
-                >
-                  <i class="fa-solid fa-trash fa-fw"></i>
-                </button>
-              </td>
-            </tr>
+            <tbody id="department-table-body"></tbody>
           </table>
         </div>
         <!-- closing Tab panel for department -->
@@ -181,17 +128,7 @@
           tabindex="0"
         >
           <table class="table table-hover">
-            <tr>
-              <td class="align-middle text-nowrap">London</td>
-              <td class="align-middle text-end text-nowrap">
-                <button type="button" class="btn btn-primary btn-sm">
-                  <i class="fa-solid fa-pencil fa-fw"></i>
-                </button>
-                <button type="button" class="btn btn-primary btn-sm">
-                  <i class="fa-solid fa-trash fa-fw"></i>
-                </button>
-              </td>
-            </tr>
+            <tbody id="location-table-body"></tbody>
           </table>
         </div>
         <!-- Closing Tab panel for location -->
@@ -207,6 +144,7 @@
 
     <!-- Personnel Edit Modal start -->
     <div
+      div
       id="editPersonnelModal"
       class="modal fade"
       tabindex="-1"
@@ -309,10 +247,136 @@
     </div>
     <!-- Personnel Edit Modal End -->
 
+    <!-- Department Edit Modal start -->
+    <div id="editDepartmentModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h5 class="modal-title">Edit department</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="editDepartmentForm">
+              <input type="hidden" id="editDepartmentID" />
+
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editDepartmentName"
+                  placeholder="Title"
+                  required
+                />
+                <label for="editDepartmentName">Title</label>
+              </div>
+
+              <div class="form-floating">
+                <select
+                  class="form-select"
+                  id="editDepartmentLocation"
+                  placeholder="Department"
+                ></select>
+                <label for="editDepartmentLocation">Location</label>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="submit"
+              form="editDepartmentForm"
+              class="btn btn-outline-primary btn-sm myBtn"
+            >
+              SAVE
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Department Edit Modal End -->
+
+    <!-- Location Edit Modal start -->
+    <div
+      id="editLocationModal"
+      class="modal fade"
+      tabindex="-1"
+      data-bs-backdrop="false"
+      data-bs-keyboard="false"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h5 class="modal-title">Edit Location</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="editLocationForm">
+              <input type="hidden" id="editLocationID" />
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editLocationName"
+                  placeholder="Name"
+                  required
+                />
+                <label for="editLocationName">Name</label>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="submit"
+              form="editLocationForm"
+              class="btn btn-outline-primary btn-sm myBtn"
+            >
+              SAVE
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Location Edit Modal End -->
+
     <!-- ======== BODY END ================================= -->
+
+    <script src="libs/javascript/jquery3.7.1.js"></script>
+    <script src="libs/javascript/jquery-2.2.3.min.js"></script>
     <script src="libs/javascript/bootstrap-5.3.2.js"></script>
     <script src="libs/javascript/font-awesome6.4.0.all.min.js"></script>
-    <script src="libs/javascript/jquery-2.2.3.min.js"></script>
     <script src="libs/javascript/main.js"></script>
   </body>
 </html>
