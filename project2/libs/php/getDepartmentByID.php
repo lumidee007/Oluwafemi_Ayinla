@@ -12,9 +12,10 @@
 
 	include("config.php");
 
-	header('Content-Type: application/json; charset=UTF-8');
+	// header('Content-Type: application/json; charset=UTF-8');
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+	// $conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+	$conn = new mysqli($cd_host, $cd_userName, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
 	if (mysqli_connect_errno()) {
 		
@@ -36,6 +37,8 @@
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
 	$query = $conn->prepare('SELECT id, name, locationID FROM department WHERE id =  ?');
+
+	
 
 	$query->bind_param("i", $_REQUEST['id']);
 
@@ -65,11 +68,22 @@
 
 	}
 
+	// Fetch location data
+	$locationQuery = $conn->query("SELECT id, name FROM location");
+	$locations = [];
+
+	while ($row = mysqli_fetch_assoc($locationQuery)) {
+		$locations[] = $row;
+	}
+
+
+
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $data;
+	$output['data']['department'] = $data;
+	$output['data']['location'] = $locations;
 
 	echo json_encode($output); 
 
