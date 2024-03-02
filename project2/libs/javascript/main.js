@@ -25,9 +25,180 @@ $("#filterBtn").click(function () {
 });
 
 $("#addBtn").click(function () {
-  // Replicate the logic of the refresh button click to open the add modal for the table that is currently on display
+  if ($("#personnelBtn").hasClass("active")) {
+    $.ajax({
+      url: "libs/php/getAllDepartments.php",
+      type: "POST",
+      dataType: "json",
+      data: { type: "department" },
+      success: function (result) {
+        result.data.sort((a, b) => a.name.localeCompare(b.name));
+        var $department = $("#department");
+
+        $department.empty();
+
+        $.each(result.data, function () {
+          $department.append(
+            $("<option>", {
+              value: this.id,
+              text: this.name,
+            })
+          );
+        });
+      },
+    });
+
+    $("#addPersonnelModal").modal("show");
+  } else if ($("#departmentsBtn").hasClass("active")) {
+    $.ajax({
+      url: "libs/php/getAllLocations.php",
+      type: "POST",
+      dataType: "json",
+      data: { type: "location" },
+      success: function (result) {
+        result.data.sort((a, b) => a.name.localeCompare(b.name));
+        var $addDepartmentLocation = $("#addDepartmentLocation");
+
+        $addDepartmentLocation.empty();
+
+        $.each(result.data, function () {
+          $addDepartmentLocation.append(
+            $("<option>", {
+              value: this.id,
+              text: this.name,
+            })
+          );
+        });
+      },
+    });
+    $("#addDepartmentModal").modal("show");
+  } else {
+    $("#addLocationModal").modal("show");
+  }
 });
 
+// ============== INSERT NEW DATA INTO PERSONNEL, DEPARTMENT AND LOCATION TABLE  =================
+// ADD PERSONNEL DATA
+$("#addPersonnelForm").submit(addPersonnelData);
+
+function addPersonnelData(event) {
+  event.preventDefault();
+  let firstName = $("#firstName").val();
+  let lastName = $("#lastName").val();
+  let jobTitle = $("#jobTitle").val();
+  let email = $("#emailAddress").val();
+  let departmentID = $("#department").val();
+
+  let personnelFormData = {
+    firstName,
+    lastName,
+    jobTitle,
+    email,
+    departmentID,
+  };
+
+  $.ajax({
+    url: "libs/php/insertPersonnel.php",
+    type: "POST",
+    data: personnelFormData,
+    success: function (result) {
+      $("#addPersonnelModal").modal("hide");
+      $("#firstName").val("");
+      $("#lastName").val("");
+      $("#jobTitle").val("");
+      $("#emailAddress").val("");
+      $("#department").val("");
+
+      if (result.status.code === 200) {
+        $("#successModal").modal("show");
+      } else {
+        if (result.status.code === 400) {
+          $("#ErrorModal").modal("show");
+        } else {
+          $("#warningModal").modal("show");
+        }
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#addPersonnelModal").modal("hide");
+    },
+  });
+}
+
+// ADD DEPARTMENT DATA
+$("#addDepartmentForm").submit(addDepartmentData);
+
+function addDepartmentData(event) {
+  event.preventDefault();
+  let name = $("#addDepartmentName").val();
+  let locationID = $("#addDepartmentLocation").val();
+
+  let departmentFormData = {
+    name,
+    locationID,
+  };
+
+  $.ajax({
+    url: "libs/php/insertDepartment.php",
+    type: "POST",
+    data: departmentFormData,
+    success: function (result) {
+      $("#addDepartmentModal").modal("hide");
+      $("#addDepartmentName").val("");
+      $("#addDepartmentLocation").val("");
+
+      if (result.status.code === 200) {
+        $("#successModal").modal("show");
+      } else {
+        if (result.status.code === 400) {
+          $("#ErrorModal").modal("show");
+        } else {
+          $("#warningModal").modal("show");
+        }
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#addPersonnelModal").modal("hide");
+    },
+  });
+}
+
+// ADD LOCATION DATA
+$("#addLocationForm").submit(addLocationData);
+
+function addLocationData(event) {
+  event.preventDefault();
+  let name = $("#addLocationName").val();
+
+  let locationFormData = {
+    name,
+  };
+
+  $.ajax({
+    url: "libs/php/insertLocation.php",
+    type: "POST",
+    data: locationFormData,
+    success: function (result) {
+      $("#addLocationModal").modal("hide");
+      $("#addLocationName").val("");
+
+      if (result.status.code === 200) {
+        $("#successModal").modal("show");
+      } else {
+        if (result.status.code === 400) {
+          $("#ErrorModal").modal("show");
+        } else {
+          $("#warningModal").modal("show");
+        }
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#addPersonnelModal").modal("hide");
+    },
+  });
+}
+
+// ============== GET ALL PERSONNEL, DEPARTMENT, LOCATION DATA  =================
 // refresh personnel table
 $("#personnelBtn").click(() => getAllUsers);
 
@@ -44,15 +215,12 @@ $("#editPersonnelModal").on("show.bs.modal", function (e) {
     type: "POST",
     dataType: "json",
     data: {
-      id: $(e.relatedTarget).attr("data-id"), // Retrieves the data-id attribute from the calling button
+      id: $(e.relatedTarget).attr("data-id"),
     },
     success: function (result) {
       var resultCode = result.status.code;
 
       if (resultCode == 200) {
-        // Update the hidden input with the employee id so that
-        // it can be referenced when the form is submitted
-
         $("#editPersonnelEmployeeID").val(result.data.personnel[0].id);
 
         $("#editPersonnelFirstName").val(result.data.personnel[0].firstName);
