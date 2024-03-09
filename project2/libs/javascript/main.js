@@ -8,14 +8,15 @@ $("#searchInp").on("keyup", function () {
   // your code
 });
 
+// REFRESH PERSONNEL, DEPARTMENT AND LOCATION DATA
 $("#refreshBtn").click(function () {
   if ($("#personnelBtn").hasClass("active")) {
-    // Refresh personnel table
+    getAllUsers();
   } else {
     if ($("#departmentsBtn").hasClass("active")) {
-      // Refresh department table
+      getAllDepartment();
     } else {
-      // Refresh location table
+      getAllLocations();
     }
   }
 });
@@ -198,6 +199,64 @@ function addLocationData(event) {
   });
 }
 
+// ============== DELETE DATA FROM PERSONNEL, DEPARTMENT AND LOCATION TABLE  =================
+// DELETE PERSONNEL
+$("#deletePersonnelModal").on("show.bs.modal", function (e) {
+  $.ajax({
+    url: "libs/php/getPersonnelByID.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      id: $(e.relatedTarget).attr("data-id"),
+    },
+    success: function (result) {
+      var resultCode = result.status.code;
+
+      if (resultCode == 200) {
+        $("#deletePersonnelEmployeeID").val(result.data.personnel[0].id);
+        $firstName = result.data.personnel[0].firstName;
+        $lastName = result.data.personnel[0].lastName;
+        $("#employeeName").html(
+          "<strong>" + $firstName + " " + $lastName + "</strong>"
+        );
+      } else {
+        $("#deletePersonnelModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#deletePersonnelModal .modal-title").replaceWith(
+        "Error retrieving data"
+      );
+    },
+  });
+});
+
+$("#deletePersonnelForm").submit(function (event) {
+  event.preventDefault();
+
+  var deletePersonnelID = $("#deletePersonnelEmployeeID").val();
+
+  $.ajax({
+    url: "libs/php/deletePersonnelByID.php",
+    type: "POST",
+    data: { id: deletePersonnelID },
+    success: function (result) {
+      $("#deletePersonnelModal").modal("hide");
+      if (result.status.code == 200) {
+        getAllUsers();
+      } else {
+        console.error(result.status.description, "error");
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#deletePersonnelModal").modal("hide");
+      console.error(textStatus, "error");
+    },
+  });
+});
+
 // ============== GET ALL PERSONNEL, DEPARTMENT, LOCATION DATA  =================
 // refresh personnel table
 $("#personnelBtn").click(() => getAllUsers);
@@ -346,7 +405,7 @@ function getAllUsers() {
 
       // console.log(data);
       const table = document.getElementById("personnel-table-body");
-
+      $(".personnel-table-body").html("");
       // Loop through the data and append each item to a new row in the table
       data.forEach((item) => {
         // Create a new table row
@@ -415,12 +474,9 @@ function getAllUsers() {
         // Create the delete button
         const deleteButton = document.createElement("button");
         deleteButton.setAttribute("type", "button");
-        deleteButton.classList.add(
-          "btn",
-          "btn-primary",
-          "btn-sm",
-          "deletePersonnelBtn"
-        );
+        deleteButton.classList.add("btn", "btn-primary", "btn-sm", "me-1");
+        deleteButton.setAttribute("data-bs-toggle", "modal");
+        deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
         deleteButton.setAttribute("data-id", item.id);
         const deleteIcon = document.createElement("i");
         deleteIcon.classList.add("fa-solid", "fa-trash", "fa-fw");
@@ -463,7 +519,7 @@ function getAllDepartment() {
 
       // console.log(data);
       const table = document.getElementById("department-table-body");
-
+      $(".department-table-body").html("");
       data.forEach((item) => {
         // Create a new table row
         const row = document.createElement("tr");
@@ -547,6 +603,7 @@ function getAllLocations() {
       let locationData = results["data"];
       const locationTable = document.getElementById("location-table-body");
       // console.log(data);
+      $(".location-table-body").html("");
       locationData.forEach((item) => {
         // Create a new table row
         const locationRow = document.createElement("tr");
