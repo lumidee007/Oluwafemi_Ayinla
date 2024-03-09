@@ -103,7 +103,10 @@
           tabindex="0"
         >
           <table class="table table-hover">
-            <tbody id="personnel-table-body"></tbody>
+            <tbody
+              class="personnel-table-body"
+              id="personnel-table-body"
+            ></tbody>
           </table>
         </div>
         <!-- closing Tab panel for personnel -->
@@ -117,7 +120,10 @@
           tabindex="0"
         >
           <table class="table table-hover">
-            <tbody id="department-table-body"></tbody>
+            <tbody
+              class="department-table-body"
+              id="department-table-body"
+            ></tbody>
           </table>
         </div>
         <!-- closing Tab panel for department -->
@@ -131,7 +137,7 @@
           tabindex="0"
         >
           <table class="table table-hover">
-            <tbody id="location-table-body"></tbody>
+            <tbody class="location-table-body" id="location-table-body"></tbody>
           </table>
         </div>
         <!-- Closing Tab panel for location -->
@@ -244,7 +250,6 @@
 
     <!-- Personnel Edit Modal start -->
     <div
-      div
       id="editPersonnelModal"
       class="modal fade"
       tabindex="-1"
@@ -346,6 +351,55 @@
       </div>
     </div>
     <!-- Personnel Edit Modal End -->
+
+    <!-- Personnel Delete Modal start -->
+    <div id="deletePersonnelModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-danger bg-gradient text-white">
+            <h5 class="modal-title">Delete employee</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="deletePersonnelForm">
+              <input type="hidden" id="deletePersonnelEmployeeID" />
+
+              <p>
+                Are you sure you want to delete
+                <span id="employeeName"></span>'s profile?
+              </p>
+              <p>This action can't be undone.</p>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="submit"
+              form="deletePersonnelForm"
+              class="btn btn-outline-danger btn-sm myBtn"
+            >
+              YES
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Personnel Delete Modal End -->
 
     <!-- ================================DEPARTMENT SECTION================================================== -->
     <!-- Add Department Modal start -->
