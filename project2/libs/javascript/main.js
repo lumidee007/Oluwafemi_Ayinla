@@ -182,16 +182,6 @@ function addLocationData(event) {
     success: function (result) {
       $("#addLocationModal").modal("hide");
       $("#addLocationName").val("");
-
-      if (result.status.code === 200) {
-        $("#successModal").modal("show");
-      } else {
-        if (result.status.code === 400) {
-          $("#ErrorModal").modal("show");
-        } else {
-          $("#warningModal").modal("show");
-        }
-      }
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $("#addPersonnelModal").modal("hide");
@@ -253,6 +243,197 @@ $("#deletePersonnelForm").submit(function (event) {
     error: function (jqXHR, textStatus, errorThrown) {
       $("#deletePersonnelModal").modal("hide");
       console.error(textStatus, "error");
+    },
+  });
+});
+
+// DELETE DEPARTMENT
+let deptRow = null;
+let personnelInDepartment = null;
+$("#deleteDepartmentModal").on("show.bs.modal", (e) => {
+  $("#departmentID").val($(e.relatedTarget).attr("data-id"));
+  deptRow = $(e.relatedTarget).closest("tr");
+  const targetDepartment = deptRow[0].children[0].innerText;
+
+  personnelInDepartment = [];
+  $.ajax({
+    type: "GET",
+    url: "libs/php/getAll.php",
+    dataType: "json",
+    success: function (result) {
+      let data = result["data"];
+      data.forEach((i) => {
+        if (i.departmentId == $(e.relatedTarget).attr("data-id")) {
+          personnelInDepartment.push(i);
+        }
+      });
+      if (personnelInDepartment.length > 0) {
+        $("#deleteDepartmentModal .modal-body p").html(
+          `There are currently ${personnelInDepartment.length} employees assigned to ${targetDepartment}.  Deleting is not possible.`
+        );
+        $("#deleteDepartmentModal .modal-footer").html(
+          `<button type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal">Close</button>`
+        );
+      } else {
+        $("#deleteDepartmentModal .modal-body p").html(
+          `This action can't be reversed. Are you sure you want to delete ${targetDepartment}?`
+        );
+        $("#deleteDepartmentModal .modal-footer").html(`
+              <button type="submit"
+              form="deleteDepartmentForm"
+              class="btn btn-outline-primary btn-sm myBtn">Yes
+              </button>
+              <button type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal">Cancel</button>
+                `);
+      }
+    },
+  });
+});
+
+$("#deleteDepartmentForm").submit(function (e) {
+  e.preventDefault();
+  // var dept_id = $("#departmentID").val();
+  $.ajax({
+    url: `libs/php/deleteDepartmentByID.php`,
+    type: "POST",
+    data: {
+      id: $("#departmentID").val(),
+    },
+    success: function (result) {
+      $("#deleteDepartmentModal").modal("hide");
+      getAllDepartment();
+    },
+  });
+});
+
+// DELETE LOCATION
+let locID = null;
+let locRow = null;
+let departmentInLocation = [];
+$("#deleteLocationModal").on("show.bs.modal", function (e) {
+  locRow = $(e.relatedTarget).closest("tr");
+  $("#LocationID").val($(e.relatedTarget).attr("data-id"));
+  let locationForDelete = locRow[0].children[0].innerText;
+  departmentInLocation = [];
+  $.ajax({
+    url: "libs/php/getLocationByID.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      id: $(e.relatedTarget).attr("data-id"),
+    },
+    success: function (result) {
+      targetLocation = result.data.location[0].name;
+      let resultCode = result.status.code;
+      if (resultCode == 200) {
+        $.ajax({
+          type: "GET",
+          url: "libs/php/getAllDepartments.php",
+          // data: {},
+          dataType: "json",
+          async: false,
+          success: function (results) {
+            // Update Main HTML Table
+            let data = results["data"];
+            data.forEach((i) => {
+              if (i.location == targetLocation) {
+                departmentInLocation.push(i);
+              }
+            });
+            if (departmentInLocation.length > 0) {
+              $("#deleteLocationModal .modal-body p").html(
+                `There are currently ${departmentInLocation.length} departments assigned to ${locationForDelete}.  Deleting is not possible.`
+              );
+              $("#deleteLocationModal .modal-footer").html(
+                `<button type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal">Close</button>`
+              );
+            } else {
+              $("#deleteLocationModal .modal-body p").html(
+                `This action can't be reversed. Are you sure you want to delete ${locationForDelete}?`
+              );
+              $("#deleteLocationModal .modal-footer").html(
+                `<button type="submit"
+              form="deleteLocationForm"
+              class="btn btn-outline-primary btn-sm myBtn">Yes
+              </button>
+              <button type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal">Cancel</button>`
+              );
+            }
+          },
+        });
+      } else {
+        $("#deleteLocationModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#deleteLocationModal .modal-title").replaceWith(
+        "Error retrieving data"
+      );
+    },
+  });
+  // $.ajax({
+  //   type: "GET",
+  //   url: "libs/php/getAllDepartments.php",
+  //   // data: {},
+  //   dataType: "json",
+  //   async: false,
+  //   success: function (results) {
+  //     // Update Main HTML Table
+  //     let data = results["data"];
+  //     data.forEach((i) => {
+  //       if (i.location == targetLocation) {
+  //         departmentInLocation.push(i);
+  //       }
+  //     });
+
+  //     if (departmentInLocation.length > 0) {
+  //       $("#deleteLocationModal .modal-body p").html(
+  //         `There are currently ${departmentInLocation.length} departments assigned to ${locationForDelete}. Unable to remove.`
+  //       );
+  //       $("#deleteLocationModal .modal-footer").html(
+  //         `<button type="button"
+  //             class="btn btn-outline-primary btn-sm myBtn"
+  //             data-bs-dismiss="modal">Close</button>`
+  //       );
+  //     } else {
+  //       $("#deleteLocationModal .modal-body p").html(
+  //         `This action cannot be undone. Are you sure you want to delete ${locationForDelete}?`
+  //       );
+  //       $("#deleteLocationModal .modal-footer").html(
+  //         `<button type="submit"
+  //             form="deleteLocationForm"
+  //             class="btn btn-outline-primary btn-sm myBtn">Yes
+  //             </button>
+  //             <button type="button"
+  //             class="btn btn-outline-primary btn-sm myBtn"
+  //             data-bs-dismiss="modal">Cancel</button>`
+  //       );
+  //     }
+  //   },
+  // });
+});
+
+$("#deleteLocationForm").submit(function (e) {
+  e.preventDefault();
+  $.ajax({
+    url: `libs/php/deleteLocationByID.php`,
+    type: "POST",
+    data: {
+      id: $("#LocationID").val(),
+    },
+    success: function (result) {
+      $("#deleteLocationModal").modal("hide");
+      getAllLocation();
     },
   });
 });
