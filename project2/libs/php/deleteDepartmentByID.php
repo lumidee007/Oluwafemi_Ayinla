@@ -8,7 +8,7 @@
 
 	include("config.php");
 
-	header('Content-Type: application/json; charset=UTF-8');
+	// header('Content-Type: application/json; charset=UTF-8');
 
 
 	$conn = new mysqli($cd_host, $cd_userName, $cd_password, $cd_dbname, $cd_port, $cd_socket);
@@ -29,6 +29,7 @@
 		exit;
 
 	}	
+
 
 
 	$query = $conn->prepare('DELETE FROM department WHERE id = ?');
