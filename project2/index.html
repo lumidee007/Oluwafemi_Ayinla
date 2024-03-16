@@ -40,6 +40,136 @@
             </div>
           </div>
         </div>
+        <!-- =========================FILTER SECTION=======================-->
+        <!-- Filter Personnel Modal -->
+        <div id="filterPersonnelModal" class="modal fade">
+          <div
+            class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+          >
+            <div class="modal-content shadow">
+              <div class="modal-header bg-primary bg-gradient text-white">
+                <h4 class="modal-title">Filter</h4>
+                <button
+                  type="button"
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <!-- Select for Personnel Department -->
+
+                <label for="selectPersonnelDepartment"></label>
+                <select
+                  id="selectPersonnelDepartment"
+                  class="form-select"
+                ></select>
+
+                <!-- Select for Personnel Location -->
+                <label for="selectPersonnelLocation"></label>
+
+                <select
+                  id="selectPersonnelLocation"
+                  class="form-select"
+                ></select>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm myBtn"
+                  id="applyPersonnelFilterButton"
+                >
+                  APPLY
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm myBtn"
+                  data-bs-dismiss="modal"
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Department Modal -->
+        <div id="filterDepartmentModal" class="modal fade">
+          <div
+            class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+          >
+            <div class="modal-content shadow">
+              <div class="modal-header bg-primary bg-gradient text-white">
+                <h4 class="modal-title">Filter Location</h4>
+                <button
+                  type="button"
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body text-start">
+                <label for="selectDepartmentLocation"></label>
+                <select
+                  id="selectDepartmentLocation"
+                  class="form-select"
+                ></select>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm myBtn"
+                  id="applyDepartmentFilterButton"
+                >
+                  APPLY
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm myBtn"
+                  data-bs-dismiss="modal"
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Location Modal -->
+        <div id="filterLocationModal" class="modal fade">
+          <div
+            class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+          >
+            <div class="modal-content shadow">
+              <div class="modal-header bg-primary bg-gradient text-white">
+                <h4 class="modal-title">Filter</h4>
+                <button
+                  type="button"
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body text-start">
+                <p>
+                  Apologies, no filtering option available for the location.
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm myBtn"
+                  data-bs-dismiss="modal"
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================FILTER SECTION END=========================== -->
+
         <nav>
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -358,7 +488,7 @@
         class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
       >
         <div class="modal-content shadow">
-          <div class="modal-header bg-danger bg-gradient text-white">
+          <div class="modal-header bg-primary bg-gradient text-white">
             <h5 class="modal-title">Delete employee</h5>
             <button
               type="button"
@@ -384,7 +514,7 @@
             <button
               type="submit"
               form="deletePersonnelForm"
-              class="btn btn-outline-danger btn-sm myBtn"
+              class="btn btn-outline-primary btn-sm myBtn"
             >
               YES
             </button>
@@ -399,7 +529,6 @@
         </div>
       </div>
     </div>
-    <!-- Personnel Delete Modal End -->
 
     <!-- ================================DEPARTMENT SECTION================================================== -->
     <!-- Add Department Modal start -->
