@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="./libs/images/favicon.png"
+      type="image/png"
+    />
     <link href="libs/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="libs/css/fonts-awesome6/css/all.css" />
     <link rel="stylesheet" href="libs/css/fonts-awesome6/css/all.min.css" />
@@ -142,7 +147,7 @@
           >
             <div class="modal-content shadow">
               <div class="modal-header bg-primary bg-gradient text-white">
-                <h4 class="modal-title">Filter</h4>
+                <h4 class="modal-title">Alert</h4>
                 <button
                   type="button"
                   class="btn-close btn-close-white"
@@ -530,6 +535,38 @@
       </div>
     </div>
 
+    <!-- Personnel Data Integrity check  -->
+
+    <div id="personnelCheckModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h4 class="modal-title">Duplicate Alert</h4>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body text-start">
+            <p>This person already exists and cannot be added again.</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ================================DEPARTMENT SECTION================================================== -->
     <!-- Add Department Modal start -->
     <div id="addDepartmentModal" class="modal fade">
@@ -683,7 +720,40 @@
         </div>
       </div>
     </div>
-    <!-- Department Delete Modal End -->
+    <!-- department Data Integrity check  -->
+
+    <div id="departmentCheckModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h4 class="modal-title">Duplicate Alert</h4>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body text-start">
+            <p>
+              This department already exists in the selected location and cannot
+              be added again.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm myBtn"
+              data-bs-dismiss="modal"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- ================================LOCATION SECTION================================================== -->
     <!-- Add location Modal End -->
@@ -829,46 +899,74 @@
       </div>
     </div>
     <!-- Local Delete Modal End -->
-    <!-- Location Edit Modal End -->
 
-    <!-- <div
-      class="modal fade"
-      id="successModal"
-      tabindex="-1"
-      aria-labelledby="successModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="successModalLabel">Success</h5>
+    <!-- Location Data Integrity check  -->
+
+    <div id="locationCheckModal" class="modal fade">
+      <div
+        class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary bg-gradient text-white">
+            <h4 class="modal-title">Duplicate Alert</h4>
             <button
               type="button"
-              class="btn-close"
+              class="btn-close btn-close-white"
               data-bs-dismiss="modal"
               aria-label="Close"
             ></button>
           </div>
-          <div class="modal-body">
-            Data has been successfully added to the database.
+          <div class="modal-body text-start">
+            <p>This location already exists and cannot be added again.</p>
           </div>
           <div class="modal-footer">
             <button
               type="button"
-              class="btn btn-secondary"
+              class="btn btn-outline-primary btn-sm myBtn"
               data-bs-dismiss="modal"
             >
-              Close
+              CANCEL
             </button>
           </div>
         </div>
       </div>
-    </div> -->
-
+    </div>
+    <!-- Modal container for dynamic message -->
+    <div id="modalContainer">
+      <div
+        class="modal fade"
+        id="dynamicMessageModal"
+        tabindex="-1"
+        aria-labelledby="modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-primary bg-gradient text-white">
+              <h5 class="modal-title" id="modalLabel">Notification</h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body" id="modalMessage"></div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- ======== BODY END ================================= -->
 
-    <!-- <script src="libs/javascript/jquery3.7.1.js"></script> -->
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="libs/javascript/jquery-2.2.3.min.js"></script>
     <script src="libs/javascript/bootstrap-5.3.2.js"></script>
     <script src="libs/javascript/font-awesome6.4.0.all.min.js"></script>
