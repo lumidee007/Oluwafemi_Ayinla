@@ -1,10 +1,10 @@
 $(document).ready(function () {
-  getAllUsers();
-  getAllDepartment();
+  getAllPersonnels();
+  getAllDepartments();
   getAllLocations();
 });
 
-// ========================= SEARCH =================================
+// ++++++++++++++++++++++++++++++  SEARCH  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 $("#searchInp").on("keyup", function () {
   let searchTerm = $(searchInp).val().toLowerCase();
   let activeButtonId = $(".nav-link.active").attr("data-bs-target");
@@ -292,10 +292,10 @@ function refreshData() {
   document.getElementById("searchInp").value = "";
   if ($("#personnelBtn").hasClass("active")) {
     $("#personnel-table-body").html("");
-    getAllUsers();
+    getAllPersonnels();
   } else {
     if ($("#departmentsBtn").hasClass("active")) {
-      getAllDepartment();
+      getAllDepartments();
     } else {
       getAllLocations();
     }
@@ -766,6 +766,7 @@ $("#addBtn").click(function () {
 });
 
 // ============== INSERT NEW DATA INTO PERSONNEL, DEPARTMENT AND LOCATION TABLE  =================
+
 // ADD PERSONNEL DATA
 $("#addPersonnelForm").submit(addPersonnelData);
 
@@ -784,23 +785,47 @@ function addPersonnelData(event) {
     email,
     departmentID,
   };
-
+  let personnelExist = false;
   $.ajax({
-    url: "libs/php/insertPersonnel.php",
-    type: "POST",
-    data: personnelFormData,
+    url: "libs/php/getAll.php",
+    type: "GET",
+    dataType: "json",
     success: function (result) {
-      $("#addPersonnelModal").modal("hide");
-      $("#firstName").val("");
-      $("#lastName").val("");
-      $("#jobTitle").val("");
-      $("#emailAddress").val("");
-      $("#department").val("");
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      $("#addPersonnelModal").modal("hide");
+      for (item of result.data) {
+        if (item.email == personnelFormData.email) {
+          personnelExist = true;
+          $("#addPersonnelModal").modal("hide");
+          $("#personnelCheckModal").modal("show");
+          break;
+        }
+      }
+
+      if (!personnelExist) {
+        $.ajax({
+          url: "libs/php/insertPersonnel.php",
+          type: "POST",
+          dataType: "json",
+          data: personnelFormData,
+          success: function (result) {
+            $("#addPersonnelModal").modal("hide");
+            $("#firstName").val("");
+            $("#lastName").val("");
+            $("#jobTitle").val("");
+            $("#emailAddress").val("");
+            $("#department").val("");
+            getAllPersonnels();
+            updateModalMessage("Personnel added successfully");
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $("#addPersonnelModal").modal("hide");
+            updateModalMessage("Error adding personnel");
+          },
+        });
+      }
     },
   });
+
+  $(this).trigger("reset");
 }
 
 // ADD DEPARTMENT DATA
@@ -811,34 +836,68 @@ function addDepartmentData(event) {
   let name = $("#addDepartmentName").val();
   let locationID = $("#addDepartmentLocation").val();
 
+  let departmentLocation = null;
+  let departmentExist = false;
+
   let departmentFormData = {
     name,
     locationID,
   };
 
   $.ajax({
-    url: "libs/php/insertDepartment.php",
-    type: "POST",
-    data: departmentFormData,
+    url: "libs/php/getAllLocations.php",
+    type: "GET",
+    dataType: "json",
     success: function (result) {
-      $("#addDepartmentModal").modal("hide");
-      $("#addDepartmentName").val("");
-      $("#addDepartmentLocation").val("");
-
-      // if (result.status.code === 200) {
-      //   $("#successModal").modal("show");
-      // } else {
-      //   if (result.status.code === 400) {
-      //     $("#ErrorModal").modal("show");
-      //   } else {
-      //     $("#warningModal").modal("show");
-      //   }
-      // }
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      $("#addPersonnelModal").modal("hide");
+      for (item of result.data) {
+        if (item.id == departmentFormData.locationID) {
+          departmentLocation = item.name;
+          break;
+        }
+      }
     },
   });
+
+  setTimeout(function () {
+    $.ajax({
+      url: "libs/php/getAllDepartments.php",
+      type: "GET",
+      dataType: "json",
+      success: function (result) {
+        for (item of result.data) {
+          if (
+            item.name == departmentFormData.name &&
+            item.location == departmentLocation
+          ) {
+            departmentExist = true;
+            $("#addDepartmentModal").modal("hide");
+            $("#departmentCheckModal").modal("show");
+            break;
+          }
+        }
+        if (!departmentExist) {
+          $.ajax({
+            url: "libs/php/insertDepartment.php",
+            type: "POST",
+            data: departmentFormData,
+            success: function (result) {
+              $("#addDepartmentModal").modal("hide");
+              $("#addDepartmentName").val("");
+              $("#addDepartmentLocation").val("");
+              updateModalMessage("Department added successfully");
+              getAllDepartments();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              $("#addPersonnelModal").modal("hide");
+              updateModalMessage("Error adding department");
+            },
+          });
+        }
+      },
+    });
+  });
+
+  $(this).trigger("reset");
 }
 
 // ADD LOCATION DATA
@@ -851,19 +910,41 @@ function addLocationData(event) {
   let locationFormData = {
     name,
   };
-
+  let locationExist = false;
   $.ajax({
-    url: "libs/php/insertLocation.php",
-    type: "POST",
-    data: locationFormData,
+    url: "libs/php/getAllLocations.php",
+    type: "GET",
+    dataType: "json",
     success: function (result) {
-      $("#addLocationModal").modal("hide");
-      $("#addLocationName").val("");
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      $("#addPersonnelModal").modal("hide");
+      for (item of result.data) {
+        if (locationFormData.name == item.name) {
+          locationExist = true;
+          $("#addLocationModal").modal("hide");
+          $("#locationCheckModal").modal("show");
+          break;
+        }
+      }
+
+      if (!locationExist) {
+        $.ajax({
+          url: "libs/php/insertLocation.php",
+          type: "POST",
+          data: locationFormData,
+          success: function (result) {
+            $("#addLocationModal").modal("hide");
+            $("#addLocationName").val("");
+            getAllLocations();
+            updateModalMessage("Location added successfully");
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $("#addPersonnelModal").modal("hide");
+          },
+        });
+      }
     },
   });
+
+  $(this).trigger("reset");
 }
 
 // ============== DELETE DATA FROM PERSONNEL, DEPARTMENT AND LOCATION TABLE  =================
@@ -910,14 +991,9 @@ $("#deletePersonnelForm").submit(function (event) {
     type: "POST",
     data: { id: deletePersonnelID },
     success: function (result) {
-      getAllUsers();
+      getAllPersonnels();
+      updateModalMessage("Personnel deleted successfully");
       $("#deletePersonnelModal").modal("hide");
-
-      // if (result.status.code == 200) {
-      //   getAllUsers();
-      // } else {
-      //   console.error(result.status.description, "error");
-      // }
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $("#deletePersonnelModal").modal("hide");
@@ -984,7 +1060,8 @@ $("#deleteDepartmentForm").submit(function (e) {
     },
     success: function (result) {
       $("#deleteDepartmentModal").modal("hide");
-      getAllDepartment();
+      getAllDepartments();
+      updateModalMessage("Department deleted successfully");
     },
   });
 });
@@ -1112,7 +1189,8 @@ $("#deleteLocationForm").submit(function (e) {
     },
     success: function (result) {
       $("#deleteLocationModal").modal("hide");
-      getAllLocation();
+      getAllLocations();
+      updateModalMessage("Location deleted successfully");
     },
   });
 });
@@ -1201,7 +1279,7 @@ $("#editPersonnelForm").submit(function (event) {
     data: formData,
     dataType: "json",
     success: function (result) {
-      getAllUsers();
+      getAllPersonnels();
       $("#editPersonnelModal").modal("hide");
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -1270,7 +1348,7 @@ $("#editDepartmentForm").submit(function (event) {
     data: formData,
     dataType: "json",
     success: function (result) {
-      getAllDepartment();
+      getAllDepartments();
       $("#editDepartmentModal").modal("hide");
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -1333,7 +1411,7 @@ $("#editLocationForm").submit(function (event) {
 });
 
 //===================================== GET ALL PERSONNEL========================================================
-function getAllUsers() {
+function getAllPersonnels() {
   // Generate all user data for the table
   $.ajax({
     type: "GET",
@@ -1448,7 +1526,7 @@ function getAllUsers() {
 }
 
 // =========GET ALL DEPARTMENTS =================================
-function getAllDepartment() {
+function getAllDepartments() {
   // Generate all user data for the table
   $.ajax({
     type: "GET",
@@ -1607,4 +1685,10 @@ function getAllLocations() {
       console.log(errorThrown);
     },
   });
+}
+
+// Dynamic Modal message
+function updateModalMessage(message) {
+  $("#modalMessage").text(message);
+  $("#dynamicMessageModal").modal("show");
 }
