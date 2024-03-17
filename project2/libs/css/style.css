@@ -24,3 +24,23 @@ tr {
 .myBtn {
   width: 70px;
 }
+
+/* .modal:nth-of-type(even) {
+  z-index: 1062 !important;
+}
+.modal-backdrop.show:nth-of-type(even) {
+  z-index: 1061 !important;
+} */
+
+.text-center {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#personnel-table {
+  width: 100%;
+  margin: 0 auto;
+}
