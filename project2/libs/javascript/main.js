@@ -605,7 +605,6 @@ $("#filterDepartmentModal").on("hidden.bs.modal", function () {
 });
 
 $("#filterBtn").click(function () {
-  // Open a modal of your own design that allows the user to apply a filter to the personnel table on either department or location
   var activeButtonId = $(".nav-link.active").attr("data-bs-target");
   $("#selectPersonnelDepartment").val("");
   $("#selectPersonnelLocation").val("");
@@ -673,7 +672,6 @@ $("#filterBtn").click(function () {
     });
     $("#filterPersonnelModal").modal("show");
   } else if (activeButtonId === "#departments-tab-pane") {
-    // populateDepartmentLocationOptions();
     var selectDepartmentLocation = $("#selectDepartmentLocation");
 
     selectDepartmentLocation.empty();
@@ -938,6 +936,7 @@ function addLocationData(event) {
           },
           error: function (jqXHR, textStatus, errorThrown) {
             $("#addPersonnelModal").modal("hide");
+            updateModalMessage("Error adding location.");
           },
         });
       }
@@ -1024,7 +1023,7 @@ $("#deleteDepartmentModal").on("show.bs.modal", (e) => {
       });
       if (personnelInDepartment.length > 0) {
         $("#deleteDepartmentModal .modal-body p").html(
-          `There are currently ${personnelInDepartment.length} employees assigned to ${targetDepartment}.  Deleting is not possible.`
+          `There are currently ${personnelInDepartment.length} employee(s) assigned to ${targetDepartment}.  Deletion is not possible.`
         );
         $("#deleteDepartmentModal .modal-footer").html(
           `<button type="button"
@@ -1051,7 +1050,6 @@ $("#deleteDepartmentModal").on("show.bs.modal", (e) => {
 
 $("#deleteDepartmentForm").submit(function (e) {
   e.preventDefault();
-  // var dept_id = $("#departmentID").val();
   $.ajax({
     url: `libs/php/deleteDepartmentByID.php`,
     type: "POST",
@@ -1102,7 +1100,7 @@ $("#deleteLocationModal").on("show.bs.modal", function (e) {
             });
             if (departmentInLocation.length > 0) {
               $("#deleteLocationModal .modal-body p").html(
-                `There are currently ${departmentInLocation.length} departments assigned to ${locationForDelete}.  Deleting is not possible.`
+                `There are currently ${departmentInLocation.length} department(s) assigned to ${locationForDelete}.  Deletion is not possible.`
               );
               $("#deleteLocationModal .modal-footer").html(
                 `<button type="button"
@@ -1137,46 +1135,6 @@ $("#deleteLocationModal").on("show.bs.modal", function (e) {
       );
     },
   });
-  // $.ajax({
-  //   type: "GET",
-  //   url: "libs/php/getAllDepartments.php",
-  //   // data: {},
-  //   dataType: "json",
-  //   async: false,
-  //   success: function (results) {
-  //     // Update Main HTML Table
-  //     let data = results["data"];
-  //     data.forEach((i) => {
-  //       if (i.location == targetLocation) {
-  //         departmentInLocation.push(i);
-  //       }
-  //     });
-
-  //     if (departmentInLocation.length > 0) {
-  //       $("#deleteLocationModal .modal-body p").html(
-  //         `There are currently ${departmentInLocation.length} departments assigned to ${locationForDelete}. Unable to remove.`
-  //       );
-  //       $("#deleteLocationModal .modal-footer").html(
-  //         `<button type="button"
-  //             class="btn btn-outline-primary btn-sm myBtn"
-  //             data-bs-dismiss="modal">Close</button>`
-  //       );
-  //     } else {
-  //       $("#deleteLocationModal .modal-body p").html(
-  //         `This action cannot be undone. Are you sure you want to delete ${locationForDelete}?`
-  //       );
-  //       $("#deleteLocationModal .modal-footer").html(
-  //         `<button type="submit"
-  //             form="deleteLocationForm"
-  //             class="btn btn-outline-primary btn-sm myBtn">Yes
-  //             </button>
-  //             <button type="button"
-  //             class="btn btn-outline-primary btn-sm myBtn"
-  //             data-bs-dismiss="modal">Cancel</button>`
-  //       );
-  //     }
-  //   },
-  // });
 });
 
 $("#deleteLocationForm").submit(function (e) {
@@ -1191,6 +1149,10 @@ $("#deleteLocationForm").submit(function (e) {
       $("#deleteLocationModal").modal("hide");
       getAllLocations();
       updateModalMessage("Location deleted successfully");
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#deleteLocationModal").modal("hide");
+      updateModalMessage("Error deleting location.");
     },
   });
 });
@@ -1274,16 +1236,18 @@ $("#editPersonnelForm").submit(function (event) {
   };
 
   $.ajax({
-    url: "libs/php/updatePersonnel.php?",
+    url: "libs/php/updatePersonnel.php",
     type: "POST",
     data: formData,
     dataType: "json",
     success: function (result) {
       getAllPersonnels();
       $("#editPersonnelModal").modal("hide");
+      updateModalMessage("Updated successfully.");
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $("#editPersonnelModal").modal("hide");
+      updateModalMessage("Error updating.");
     },
   });
 });
@@ -1350,9 +1314,11 @@ $("#editDepartmentForm").submit(function (event) {
     success: function (result) {
       getAllDepartments();
       $("#editDepartmentModal").modal("hide");
+      updateModalMessage("Updated successfully.");
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $("#editDepartmentModal").modal("hide");
+      updateModalMessage("Error updating.");
     },
   });
 });
@@ -1403,9 +1369,11 @@ $("#editLocationForm").submit(function (event) {
     success: function (result) {
       getAllLocations();
       $("#editLocationModal").modal("hide");
+      updateModalMessage("Updated successfully");
     },
     error: function (jqXHR, textStatus, errorThrown) {
       $("#editLocationModal").modal("hide");
+      updateModalMessage("Error updating.");
     },
   });
 });
