@@ -4,7 +4,6 @@ $executionStartTime = microtime(true);
 
 include("config.php");
 
-// header('Content-Type: application/json; charset=UTF-8');
 
 $conn = new mysqli($cd_host, $cd_userName, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
@@ -23,7 +22,6 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-// Location search with wildcard
 $searchTerm = "%" . $_REQUEST['search'] . "%";
 $locationQuery = $conn->prepare('SELECT id, name FROM location WHERE name LIKE ? ORDER BY name');
 $locationQuery->bind_param("s", $searchTerm);
@@ -50,7 +48,6 @@ while ($row = mysqli_fetch_assoc($locationResult)) {
     array_push($locations, $row);
 }
 
-// Prepare and send the final output
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";

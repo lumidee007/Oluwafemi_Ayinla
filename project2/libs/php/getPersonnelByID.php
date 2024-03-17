@@ -1,9 +1,5 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/getPersonnelByID.php?id=<id>
-
-	// remove next two lines for production
 	
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
@@ -12,9 +8,6 @@
 
 	include("config.php");
 
-	// header('Content-Type: application/json; charset=UTF-8');
-
-	// $conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 	$conn = new mysqli($cd_host, $cd_userName, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
 	if (mysqli_connect_errno()) {
@@ -33,8 +26,6 @@
 
 	}	
 
-	// first query - SQL statement accepts parameters and so is prepared to avoid SQL injection.
-	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
 	$query = $conn->prepare('SELECT `id`, `firstName`, `lastName`, `email`, `jobTitle`, `departmentID` FROM `personnel` WHERE `id` = ?');
 
@@ -67,7 +58,6 @@
 
 	}
 
-	// second query - does not accept parameters and so is not prepared
 
 	$query = 'SELECT id, name from department ORDER BY name';
 

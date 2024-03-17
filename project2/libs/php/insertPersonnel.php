@@ -5,11 +5,11 @@
 
 	$executionStartTime = microtime(true);
 	
-	// this includes the login details
+
 	
 	include("config.php");
 
-	// header('Content-Type: application/json; charset=UTF-8');
+
 
 	$conn = new mysqli($cd_host, $cd_userName, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
@@ -29,8 +29,6 @@
 
 	}	
 
-
-	// $query = $conn->prepare('INSERT INTO department (name, locationID) VALUES(?,?)');
     $query = $conn->prepare('INSERT INTO personnel (firstName,lastName,jobTitle,email,departmentID) VALUES(?,?,?,?,?)');
 
 	$query->bind_param("ssssi", $_REQUEST['firstName'], $_REQUEST['lastName'], $_REQUEST['jobTitle'], $_REQUEST['email'], $_REQUEST['departmentID']);

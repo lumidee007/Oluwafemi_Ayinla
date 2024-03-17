@@ -1,9 +1,5 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAllDepartments.php
-
-	// remove next two lines for production	
 	
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
@@ -12,9 +8,7 @@
 
 	include("config.php");
 
-	// header('Content-Type: application/json; charset=UTF-8');
 
-	// $conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 	$conn = new mysqli($cd_host, $cd_userName, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 	
 
@@ -34,7 +28,6 @@
 
 	}	
 
-	// SQL does not accept parameters and so is not prepared
 
 	$query = 'SELECT d.id, d.name, d.locationID, l.name as location FROM department d LEFT JOIN location l ON (l.id=d.locationID) ORDER BY d.name';
 
