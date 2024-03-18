@@ -1159,13 +1159,13 @@ $("#deleteLocationForm").submit(function (e) {
 
 // ============== REFRESH PERSONNEL, DEPARTMENT, LOCATION DATA  =================
 // refresh personnel table
-$("#personnelBtn").click(() => getAllUsers);
+$("#personnelBtn").click(getAllPersonnels);
 
 // refresh department table
-$("#departmentsBtn").click(() => getAllDepartment);
+$("#departmentsBtn").click(getAllDepartments);
 
 // refresh location table
-$("#locationsBtn").click(() => getAllLocations);
+$("#locationsBtn").click(getAllLocations);
 // ============== EDIT DATA FROM PERSONNEL, DEPARTMENT AND LOCATION TABLE  =================
 // EDIT PERSONNEL
 
