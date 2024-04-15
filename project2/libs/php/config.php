@@ -13,14 +13,14 @@
 
 	
 
-	// $cd_dbname = "companydirectory";
-	// $cd_user = "companydirectory";
+	$cd_dbname = "companydirectory";
+	$cd_user = "companydirectory";
 	// $cd_password = "companydirectory";
 
 
-	$cd_dbname = "femiayin_company_directory";
-	$cd_userName = "femiayin_company_directory";
-	$cd_password = "Qwerty12345!@#$%";
+	// $cd_dbname = "femiayin_company_directory";
+	// $cd_userName = "femiayin_company_directory";
+	// $cd_password = "Qwerty12345!@#$%";
 ?>
 
 
